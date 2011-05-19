@@ -22,7 +22,12 @@
 
 		<script type="text/javascript" charset="utf-8">
 			$(document).ready( function () {
-				$('#example').dataTable().rowGrouping();
+				$('#example').dataTable({
+                                      "bProcessing": true,
+                                      "bServerSide": true,
+                                      "sAjaxSource": "server_processing.js"
+                                      
+                                    }).rowGrouping();
 				
 			} );
 		</script>
