@@ -22,7 +22,7 @@
 
 		<script type="text/javascript" charset="utf-8">
 			$(document).ready( function () {
-				$('#example').dataTable().rowGrouping({ iGroupingColumnIndex: 1, sGroupBy: "letter",bHideGroupingColumn: false });
+				$('#example').dataTable().rowGrouping({ iGroupingColumnIndex: 2, sGroupBy: "letter",bHideGroupingColumn: false });
 				
 			} );
 		</script>
@@ -49,12 +49,12 @@
 		<div id="container">
 			<a href="index.html">Home</a>
 			<a href="http://code.google.com/p/jquery-datatables-row-grouping/wiki/Overview">Wiki</a> 
-			<div class="full_width big">
+			<h1 class="full_width big">
 
-				JQuery DataTable Row Grouping - Grouping by letters (development)
-			</div>
+				JQuery DataTable Row Grouping - Grouping by letters
+			</h1>
 			
-			<h1>Preamble</h1>
+			<h2>Preamble</h2>
 			<p>
 				DataTables Row grouping plugin group enables you to group rows by the first letter. In this example few additional customizatons are made - second column is used for grouping and this column is not hidden.
 			</p>
@@ -63,9 +63,9 @@
 	
 			
 			
-			<h1>Live example</h1>
+			<h2>Live example</h2>
 
-
+			<p>Grouping browsers by the first letter of the third column (Platforms). Column used for grouping is not hidden.</p>
 
 
 
@@ -560,24 +560,27 @@
 			
 
 			
-			<h1>Initialization code</h1>
+			<h2>Initialization code</h2>
 			<p>In this example is set that column 1 is used for grouping using the iGroupingColumnIndex parameter, for the grouping
 			algorithm is is used grouping by letters. Also, column that is used for grouping is not hidden.</p>
 			<pre>
 			$(document).ready( function () {
-				$('#example').dataTable().rowGrouping({ iGroupingColumnIndex: 1, sGroupBy: "letter",bHideGroupingColumn: false });
+				$('#example').dataTable().rowGrouping({ iGroupingColumnIndex: 2,
+									sGroupBy: "letter",
+									bHideGroupingColumn: false });
 				
 			} );
 	</pre>
 	
 
 
-			<h1>Other examples</h1>
+			<h2>Other examples</h2>
 			<ul>
 
 				<li><a href="default.html">Basic usage</a></li>
 				<li><a href="letters.html">Group by letter</a></li>
 				<li><a href="year.html">Group by year</a></li>
+				<li><a href="customGroupOrdering.html">Custom group ordering</a></li>
 				<li><a href="serverSide.html">Server-side filtering</a></li>
 			</ul>
 			

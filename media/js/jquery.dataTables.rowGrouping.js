@@ -1,6 +1,6 @@
 /*
 * File:        jquery.dataTables.grouping.js
-* Version:     0.0.7.dev
+* Version:     0.0.8.dev
 * Author:      Jovan Popovic 
 * 
 * Copyright 2011 Jovan Popovic, all rights reserved.
@@ -47,16 +47,23 @@
             iGroupingOrderByColumnIndex: -1,
             sGrupingClass: "group",
             bHideGroupingColumn: true,
+	    bHideGroupingOrderByColumn: true,
             //bGroupingColumnFixedOrder: true,
             sGroupBy: "name",
             sDateFormat: "dd/MM/yyyy",
-            sEmptyGroupLabel: "-"
+            sEmptyGroupLabel: "-",
+	    bSetGroupingClassOnTR: false
 
         };
 
         properties = $.extend(defaults, options);
         if (properties.iGroupingOrderByColumnIndex == -1)
-            properties.iGroupingOrderByColumnIndex = properties.iGroupingColumnIndex;
+        {
+	    properties.bCustomColumnOrdering = false;
+	    properties.iGroupingOrderByColumnIndex = properties.iGroupingColumnIndex;
+	} else {
+	    properties.bCustomColumnOrdering = true;
+	}
 
         var fnGetGroup = _fnGetGroupByName;
         switch (properties.sGroupBy) {
@@ -86,16 +93,24 @@
                 var sLastGroup = null;
                 for (var i = 0; i < nTrs.length; i++) {
                     var iDisplayIndex = oSettings._iDisplayStart + i;
-                    var sGroup = oSettings.aoData[oSettings.aiDisplay[iDisplayIndex]]._aData[properties.iGroupingColumnIndex];
-                    if (sLastGroup == null || fnGetGroup(sGroup) != sLastGroup) {
+                    var sGroupData = oSettings.aoData[oSettings.aiDisplay[iDisplayIndex]]._aData[properties.iGroupingColumnIndex];
+		    var sGroup = fnGetGroup(sGroupData);
+                    if (sLastGroup == null || sGroup != sLastGroup) {
                         var nGroup = document.createElement('tr');
                         var nCell = document.createElement('td');
+
+			if(properties.bSetGroupingClassOnTR){
+				nGroup.className = properties.sGrupingClass + " " + sGroup.toLowerCase();
+			} else {
+				nCell.className = properties.sGrupingClass + " " + sGroup.toLowerCase();
+			}
+
                         nCell.colSpan = iColspan;
-                        nCell.className = properties.sGrupingClass;
-                        nCell.innerHTML = fnGetGroup(sGroup) == "" ? properties.sEmptyGroupLabel : fnGetGroup(sGroup);
+                        nCell.innerHTML = sGroup == "" ? properties.sEmptyGroupLabel : sGroup;
+			
                         nGroup.appendChild(nCell);
                         nTrs[i].parentNode.insertBefore(nGroup, nTrs[i]);
-                        sLastGroup = fnGetGroup(sGroup);
+                        sLastGroup = sGroup;
                     }
                 }
 
@@ -106,18 +121,42 @@
             };
 
             oTable.fnSetColumnVis(properties.iGroupingColumnIndex, !properties.bHideGroupingColumn);
+	    if(properties.bCustomColumnOrdering)
+	    {
+		oTable.fnSetColumnVis(properties.iGroupingOrderByColumnIndex, !properties.bHideGroupingOrderByColumn);
+	    }
             oTable.fnSettings().aoDrawCallback.push({
                 "fn": _fnDrawCallBackWithGrouping,
                 "sName": "fnRowGroupung"
             });
 
+            oTable.fnSettings().aaSortingFixed = [[properties.iGroupingOrderByColumnIndex, properties.sGroupingColumnSortDirection]];
+
+	    switch(properties.sGroupBy){
+		case "name":
+			break;
 
 
-            if (properties.sGroupBy == "name" || properties.sGroupBy == "letter") {
-                oTable.fnSettings().aaSortingFixed = [[properties.iGroupingOrderByColumnIndex, properties.sGroupingColumnSortDirection]];
-            } else {
-                oTable.fnSettings().aaSortingFixed = [[properties.iGroupingOrderByColumnIndex, properties.sGroupingColumnSortDirection]];
-                /* Create an array with the values of all the input boxes in a column */
+		case "letter":
+
+		/* Create an array with the values of all the input boxes in a column */
+                oTable.fnSettings().aoColumns[properties.iGroupingOrderByColumnIndex].sSortDataType = "rg-letter";
+                $.fn.dataTableExt.afnSortData['rg-letter'] = function (oSettings, iColumn) {
+                    var aData = [];
+                    $('td:eq(' + iColumn + ')', oSettings.oApi._fnGetTrNodes(oSettings)).each(function () {
+                        aData.push(_fnGetGroupByLetter(this.innerHTML));
+                    });
+                    return aData;
+                }
+
+
+			break;
+
+
+		case "year":
+
+
+		/* Create an array with the values of all the input boxes in a column */
                 oTable.fnSettings().aoColumns[properties.iGroupingOrderByColumnIndex].sSortDataType = "rg-date";
                 $.fn.dataTableExt.afnSortData['rg-date'] = function (oSettings, iColumn) {
                     /*
@@ -136,6 +175,20 @@
                     });
                     return aData;
                 }
+
+
+
+
+			break;	
+		default:
+			break;
+
+	    }
+            if (properties.sGroupBy == "name" || properties.sGroupBy == "letter") {
+
+            } else {
+                //oTable.fnSettings().aaSortingFixed = [[properties.iGroupingOrderByColumnIndex, properties.sGroupingColumnSortDirection]];
+                
             }
 
             oTable.fnDraw();

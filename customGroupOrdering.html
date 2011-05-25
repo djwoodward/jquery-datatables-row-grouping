@@ -5,7 +5,7 @@
 		<meta http-equiv="content-type" content="text/html; charset=UTF-8">
 		<link rel="shortcut icon" type="image/ico" href="http://www.sprymedia.co.uk/media/images/favicon.ico">
 		
-		<title>Using DataTable with row grouping plugin - Basic Example</title>
+		<title>Using DataTable with row grouping ad-on - Ordering Groups by custom column</title>
 		<style type="text/css" title="currentStyle">
 			@import "media/css/demo_page.css";
 			@import "media/css/demo_table.css";
@@ -22,7 +22,11 @@
 
 		<script type="text/javascript" charset="utf-8">
 			$(document).ready( function () {
-				$('#example').dataTable().rowGrouping();
+				$('#example').dataTable().rowGrouping({
+            							iGroupingColumnIndex: 1,
+            							sGroupingColumnSortDirection: "asc",
+            							iGroupingOrderByColumnIndex: 0
+								});
 				
 			} );
 		</script>
@@ -51,14 +55,17 @@
 			<a href="http://code.google.com/p/jquery-datatables-column-filter/wiki/ColumnFilter">Wiki</a> 
 			<h1 class="full_width big">
 
-				JQuery DataTable Row Grouping - Default Example
+				JQuery DataTable Row Grouping - Ordering groups by different column
 			</h1>
 			
 			<h2>Preamble</h2>
 			<p>
-				DataTables Row Grouping add-in group rows by cell values. Value used for grouping is added as an additional heading row in the table.
-			Default behaviour is that table will be ordered by the first colum, this column will be hidden, and cell values will be added as a grouping
-			row before rows that contain the same value in the grouping cell.
+				DataTables Row grouping plugin group rows by cell values and order groups by the value of grouping column. This behaviour
+			can be customized and you can use any other column for ordering groups. As an example you can place additional column with order
+			value used for grouping, and se different column for the actual grouping. In this example rows are grouped by "Rendering engine column
+			but rendering engines are ordered in the following order: Trident, Gecko, Webkit, Presto, Tasman, Misc, KHTML, and other browsers.
+			By default, these groups would be ordered alphabetically by the group name, but in this example is added an additional column that is
+			used for ordering.
 			</p>
 
 			
@@ -78,6 +85,7 @@
 <table cellpadding="0" cellspacing="0" border="0" class="display" id="example">
 	<thead>
 		<tr>
+			<th>Group order by</th>
 			<th>Rendering engine</th>
 			<th>Browser</th>
 			<th>Platform(s)</th>
@@ -87,7 +95,7 @@
 	</thead>
 	<tfoot>
 		<tr>
-
+			<th>Group order by</th>
 			<th>Rendering engine</th>
 			<th>Browser</th>
 			<th>Platform(s)</th>
@@ -97,7 +105,7 @@
 	</tfoot>
 	<tbody>
 		<tr class="odd_gradeX" id="2">
-			<td class="read_only">Trident</td>
+			<td>10</td><td>Trident</td>
 			<td>Internet Explorer 4.0</td>
 			<td>Win 95+</td>
 			<td class="center">4</td>
@@ -105,7 +113,7 @@
 			<td class="center">X</td>
 		</tr>
 		<tr class="even_gradeC" id="4">
-			<td>Trident</td>
+			<td>10</td><td>Trident</td>
 			<td>Internet Explorer 5.0</td>
 			<td>Win 95+</td>
 			<td class="center">5</td>
@@ -113,7 +121,7 @@
 			<td class="center">C</td>
 		</tr>
 		<tr class="odd_gradeA" id="5">
-			<td>Trident</td>
+			<td>10</td><td>Trident</td>
 			<td>Internet Explorer 5.5</td>
 			<td>Win 95+</td>
 			<td class="center">5.5</td>
@@ -121,15 +129,15 @@
 			<td class="center">A</td>
 		</tr>
 		<tr class="even_gradeA" id="1">
-			<td>Trident</td>
-			<td class="read_only">Internet Explorer 6</td>
+			<td>10</td><td>Trident</td>
+			<td>Internet Explorer 6</td>
 			<td>Win 98+</td>
 			<td class="center">6</td>
 
 			<td class="center">A</td>
 		</tr>
 		<tr class="odd_gradeA" id="5">
-			<td>Trident</td>
+			<td>10</td><td>Trident</td>
 			<td>Internet Explorer 7</td>
 			<td class="read_only">Win XP SP2+</td>
 			<td class="center">7</td>
@@ -137,7 +145,7 @@
 			<td class="center">A</td>
 		</tr>
 		<tr class="even_gradeA" id="1">
-			<td>Trident</td>
+			<td>10</td><td>Trident</td>
 			<td>AOL browser (AOL desktop)</td>
 			<td>Win XP</td>
 			<td class="center">6</td>
@@ -145,7 +153,7 @@
 			<td class="center read_only">A</td>
 		</tr>
 		<tr class="odd_gradeA" id="5">
-			<td>Gecko (UTF-8: $¢€)</td>
+			<td>30</td><td>Gecko</td>
 			<td>Firefox 1.0</td>
 			<td>Win 98+ / OSX.2+</td>
 			<td class="center">1.7</td>
@@ -153,7 +161,7 @@
 			<td class="center">A</td>
 		</tr>
 		<tr class="even_gradeA" id="1">
-			<td>Gecko</td>
+			<td>30</td><td>Gecko</td>
 			<td>Firefox 1.5</td>
 			<td>Win 98+ / OSX.2+</td>
 			<td class="center">1.8</td>
@@ -161,7 +169,7 @@
 			<td class="center">A</td>
 		</tr>
 		<tr class="odd_gradeA" id="5">
-			<td>Gecko</td>
+			<td>30</td><td>Gecko</td>
 			<td>Firefox 2.0</td>
 			<td>Win 98+ / OSX.2+</td>
 			<td class="center">1.8</td>
@@ -169,7 +177,7 @@
 			<td class="center">A</td>
 		</tr>
 		<tr class="even_gradeA" id="1">
-			<td>Gecko</td>
+			<td>30</td><td>Gecko</td>
 			<td>Firefox 3.0</td>
 			<td>Win 2k+ / OSX.3+</td>
 			<td class="center">1.9</td>
@@ -177,7 +185,7 @@
 			<td class="center">A</td>
 		</tr>
 		<tr class="odd_gradeA" id="5">
-			<td>Gecko</td>
+			<td>30</td><td>Gecko</td>
 			<td>Camino 1.0</td>
 			<td>OSX.2+</td>
 			<td class="center">1.8</td>
@@ -185,7 +193,7 @@
 			<td class="center">A</td>
 		</tr>
 		<tr class="even_gradeA" id="1">
-			<td>Gecko</td>
+			<td>30</td><td>Gecko</td>
 			<td>Camino 1.5</td>
 			<td>OSX.3+</td>
 			<td class="center">1.8</td>
@@ -193,7 +201,7 @@
 			<td class="center">A</td>
 		</tr>
 		<tr class="odd_gradeA" id="5">
-			<td>Gecko</td>
+			<td>30</td><td>Gecko</td>
 			<td>Netscape 7.2</td>
 			<td>Win 95+ / Mac OS 8.6-9.2</td>
 			<td class="center">1.7</td>
@@ -201,7 +209,7 @@
 			<td class="center">A</td>
 		</tr>
 		<tr class="even_gradeA" id="1">
-			<td>Gecko</td>
+			<td>30</td><td>Gecko</td>
 			<td>Netscape Browser 8</td>
 			<td>Win 98SE+</td>
 			<td class="center">1.7</td>
@@ -209,7 +217,7 @@
 			<td class="center">A</td>
 		</tr>
 		<tr class="odd_gradeA" id="5">
-			<td>Gecko</td>
+			<td>30</td><td>Gecko</td>
 			<td>Netscape Navigator 9</td>
 			<td>Win 98+ / OSX.2+</td>
 			<td class="center">1.8</td>
@@ -217,7 +225,7 @@
 			<td class="center">A</td>
 		</tr>
 		<tr class="even_gradeA" id="1">
-			<td>Gecko</td>
+			<td>30</td><td>Gecko</td>
 			<td>Mozilla 1.0</td>
 			<td>Win 95+ / OSX.1+</td>
 			<td class="center">1</td>
@@ -225,7 +233,7 @@
 			<td class="center">A</td>
 		</tr>
 		<tr class="odd_gradeA" id="5">
-			<td>Gecko</td>
+			<td>30</td><td>Gecko</td>
 			<td>Mozilla 1.1</td>
 			<td>Win 95+ / OSX.1+</td>
 			<td class="center">1.1</td>
@@ -233,7 +241,7 @@
 			<td class="center">A</td>
 		</tr>
 		<tr class="even_gradeA" id="1">
-			<td>Gecko</td>
+			<td>30</td><td>Gecko</td>
 			<td>Mozilla 1.2</td>
 			<td>Win 95+ / OSX.1+</td>
 			<td class="center">1.2</td>
@@ -241,7 +249,7 @@
 			<td class="center">A</td>
 		</tr>
 		<tr class="odd_gradeA" id="5">
-			<td>Gecko</td>
+			<td>30</td><td>Gecko</td>
 			<td>Mozilla 1.3</td>
 			<td>Win 95+ / OSX.1+</td>
 			<td class="center">1.3</td>
@@ -249,7 +257,7 @@
 			<td class="center">A</td>
 		</tr>
 		<tr class="even_gradeA" id="1">
-			<td>Gecko</td>
+			<td>30</td><td>Gecko</td>
 			<td>Mozilla 1.4</td>
 			<td>Win 95+ / OSX.1+</td>
 			<td class="center">1.4</td>
@@ -257,7 +265,7 @@
 			<td class="center">A</td>
 		</tr>
 		<tr class="odd_gradeA" id="5">
-			<td>Gecko</td>
+			<td>30</td><td>Gecko</td>
 			<td>Mozilla 1.5</td>
 			<td>Win 95+ / OSX.1+</td>
 			<td class="center">1.5</td>
@@ -265,7 +273,7 @@
 			<td class="center">A</td>
 		</tr>
 		<tr class="even_gradeA" id="1">
-			<td>Gecko</td>
+			<td>30</td><td>Gecko</td>
 			<td>Mozilla 1.6</td>
 			<td>Win 95+ / OSX.1+</td>
 			<td class="center">1.6</td>
@@ -273,7 +281,7 @@
 			<td class="center">A</td>
 		</tr>
 		<tr class="odd_gradeA" id="5">
-			<td>Gecko</td>
+			<td>30</td><td>Gecko</td>
 			<td>Mozilla 1.7</td>
 			<td>Win 98+ / OSX.1+</td>
 			<td class="center">1.7</td>
@@ -281,7 +289,7 @@
 			<td class="center">A</td>
 		</tr>
 		<tr class="even_gradeA" id="1">
-			<td>Gecko</td>
+			<td>30</td><td>Gecko</td>
 			<td>Mozilla 1.8</td>
 			<td>Win 98+ / OSX.1+</td>
 			<td class="center">1.8</td>
@@ -289,7 +297,7 @@
 			<td class="center">A</td>
 		</tr>
 		<tr class="odd_gradeA" id="5">
-			<td>Gecko</td>
+			<td>30</td><td>Gecko</td>
 			<td>Seamonkey 1.1</td>
 			<td>Win 98+ / OSX.2+</td>
 			<td class="center">1.8</td>
@@ -297,7 +305,7 @@
 			<td class="center">A</td>
 		</tr>
 		<tr class="even_gradeA" id="1">
-			<td>Gecko</td>
+			<td>30</td><td>Gecko</td>
 			<td>Epiphany 2.20</td>
 			<td>Gnome</td>
 			<td class="center">1.8</td>
@@ -305,7 +313,7 @@
 			<td class="center">A</td>
 		</tr>
 		<tr class="odd_gradeA" id="5">
-			<td>Webkit</td>
+			<td>50</td><td>Webkit</td>
 			<td>Safari 1.2</td>
 			<td>OSX.3</td>
 			<td class="center">125.5</td>
@@ -313,7 +321,7 @@
 			<td class="center">A</td>
 		</tr>
 		<tr class="even_gradeA" id="1">
-			<td>Webkit</td>
+			<td>50</td><td>Webkit</td>
 			<td>Safari 1.3</td>
 			<td>OSX.3</td>
 			<td class="center">312.8</td>
@@ -321,7 +329,7 @@
 			<td class="center">A</td>
 		</tr>
 		<tr class="odd_gradeA" id="5">
-			<td>Webkit</td>
+			<td>50</td><td>Webkit</td>
 			<td>Safari 2.0</td>
 			<td>OSX.4+</td>
 			<td class="center">419.3</td>
@@ -329,7 +337,7 @@
 			<td class="center">A</td>
 		</tr>
 		<tr class="even_gradeA" id="1">
-			<td>Webkit</td>
+			<td>50</td><td>Webkit</td>
 			<td>Safari 3.0</td>
 			<td>OSX.4+</td>
 			<td class="center">522.1</td>
@@ -337,7 +345,7 @@
 			<td class="center">A</td>
 		</tr>
 		<tr class="odd_gradeA" id="5">
-			<td>Webkit</td>
+			<td>50</td><td>Webkit</td>
 			<td>OmniWeb 5.5</td>
 			<td>OSX.4+</td>
 			<td class="center">420</td>
@@ -345,7 +353,7 @@
 			<td class="center">A</td>
 		</tr>
 		<tr class="even_gradeA" id="1">
-			<td>Webkit</td>
+			<td>50</td><td>Webkit</td>
 			<td>iPod Touch / iPhone</td>
 			<td>iPod</td>
 			<td class="center">420.1</td>
@@ -353,7 +361,7 @@
 			<td class="center">A</td>
 		</tr>
 		<tr class="odd_gradeA" id="5">
-			<td>Webkit</td>
+			<td>50</td><td>Webkit</td>
 			<td>S60</td>
 			<td>S60</td>
 			<td class="center">413</td>
@@ -361,7 +369,7 @@
 			<td class="center">A</td>
 		</tr>
 		<tr class="even_gradeA" id="1">
-			<td>Presto</td>
+			<td>70</td><td>Presto</td>
 			<td>Opera 7.0</td>
 			<td>Win 95+ / OSX.1+</td>
 			<td class="center">-</td>
@@ -369,7 +377,7 @@
 			<td class="center">A</td>
 		</tr>
 		<tr class="odd_gradeA" id="5">
-			<td>Presto</td>
+			<td>70</td><td>Presto</td>
 			<td>Opera 7.5</td>
 			<td>Win 95+ / OSX.2+</td>
 			<td class="center">-</td>
@@ -377,7 +385,7 @@
 			<td class="center">A</td>
 		</tr>
 		<tr class="even_gradeA" id="1">
-			<td>Presto</td>
+			<td>70</td><td>Presto</td>
 			<td>Opera 8.0</td>
 			<td>Win 95+ / OSX.2+</td>
 			<td class="center">-</td>
@@ -385,7 +393,7 @@
 			<td class="center">A</td>
 		</tr>
 		<tr class="odd_gradeA" id="5">
-			<td>Presto</td>
+			<td>70</td><td>Presto</td>
 			<td>Opera 8.5</td>
 			<td>Win 95+ / OSX.2+</td>
 			<td class="center">-</td>
@@ -393,7 +401,7 @@
 			<td class="center">A</td>
 		</tr>
 		<tr class="even_gradeA" id="1">
-			<td>Presto</td>
+			<td>70</td><td>Presto</td>
 			<td>Opera 9.0</td>
 			<td>Win 95+ / OSX.3+</td>
 			<td class="center">-</td>
@@ -401,7 +409,7 @@
 			<td class="center">A</td>
 		</tr>
 		<tr class="odd_gradeA" id="5">
-			<td>Presto</td>
+			<td>70</td><td>Presto</td>
 			<td>Opera 9.2</td>
 			<td>Win 88+ / OSX.3+</td>
 			<td class="center">-</td>
@@ -409,7 +417,7 @@
 			<td class="center">A</td>
 		</tr>
 		<tr class="even_gradeA" id="1">
-			<td>Presto</td>
+			<td>70</td><td>Presto</td>
 			<td>Opera 9.5</td>
 			<td>Win 88+ / OSX.3+</td>
 			<td class="center">-</td>
@@ -417,7 +425,7 @@
 			<td class="center">A</td>
 		</tr>
 		<tr class="odd_gradeA" id="5">
-			<td>Presto</td>
+			<td>70</td><td>Presto</td>
 			<td>Opera for Wii</td>
 			<td>Wii</td>
 			<td class="center">-</td>
@@ -425,7 +433,7 @@
 			<td class="center">A</td>
 		</tr>
 		<tr class="even_gradeA" id="1">
-			<td>Presto</td>
+			<td>70</td><td>Presto</td>
 			<td>Nokia N800</td>
 			<td>N800</td>
 			<td class="center">-</td>
@@ -433,7 +441,7 @@
 			<td class="center">A</td>
 		</tr>
 		<tr class="odd_gradeA" id="5">
-			<td>Presto</td>
+			<td>70</td><td>Presto</td>
 			<td>Nintendo DS browser</td>
 			<td>Nintendo DS</td>
 			<td class="center">8.5</td>
@@ -441,7 +449,7 @@
 			<td class="center">C/A<sup>1</sup></td>
 		</tr>
 		<tr class="even_gradeC" id="4">
-			<td>KHTML</td>
+			<td>140</td><td>KHTML</td>
 			<td>Konqureror 3.1</td>
 			<td>KDE 3.1</td>
 
@@ -449,7 +457,7 @@
 			<td class="center">C</td>
 		</tr>
 		<tr class="odd_gradeA" id="5">
-			<td>KHTML</td>
+			<td>140</td><td>KHTML</td>
 			<td>Konqureror 3.3</td>
 			<td>KDE 3.3</td>
 
@@ -457,7 +465,7 @@
 			<td class="center">A</td>
 		</tr>
 		<tr class="even_gradeA" id="1">
-			<td>KHTML</td>
+			<td>140</td><td>KHTML</td>
 			<td>Konqureror 3.5</td>
 			<td>KDE 3.5</td>
 
@@ -465,7 +473,7 @@
 			<td class="center">A</td>
 		</tr>
 		<tr class="odd_gradeX" id="2">
-			<td>Tasman</td>
+			<td>90</td><td>Tasman</td>
 			<td>Internet Explorer 4.5</td>
 			<td>Mac OS 8-9</td>
 
@@ -473,7 +481,7 @@
 			<td class="center">X</td>
 		</tr>
 		<tr class="even_gradeC" id="4">
-			<td>Tasman</td>
+			<td>90</td><td>Tasman</td>
 			<td>Internet Explorer 5.1</td>
 			<td>Mac OS 7.6-9</td>
 
@@ -481,7 +489,7 @@
 			<td class="center">C</td>
 		</tr>
 		<tr class="odd_gradeC" id="3">
-			<td>Tasman</td>
+			<td>90</td><td>Tasman</td>
 			<td>Internet Explorer 5.2</td>
 			<td>Mac OS 8-X</td>
 
@@ -489,7 +497,7 @@
 			<td class="center">C</td>
 		</tr>
 		<tr class="even_gradeA" id="1">
-			<td>Misc</td>
+			<td>110</td><td>Misc</td>
 			<td>NetFront 3.1</td>
 			<td>Embedded devices</td>
 
@@ -497,7 +505,7 @@
 			<td class="center">C</td>
 		</tr>
 		<tr class="odd_gradeA" id="5">
-			<td>Misc</td>
+			<td>110</td><td>Misc</td>
 			<td>NetFront 3.4</td>
 			<td>Embedded devices</td>
 
@@ -505,7 +513,7 @@
 			<td class="center">A</td>
 		</tr>
 		<tr class="even_gradeX" id="11">
-			<td>Misc</td>
+			<td>110</td><td>Misc</td>
 			<td>Dillo 0.8</td>
 			<td>Embedded devices</td>
 
@@ -513,7 +521,7 @@
 			<td class="center">X</td>
 		</tr>
 		<tr class="odd_gradeX" id="2">
-			<td>Misc</td>
+			<td>110</td><td>Misc</td>
 			<td>Links</td>
 			<td>Text only</td>
 
@@ -521,7 +529,7 @@
 			<td class="center">X</td>
 		</tr>
 		<tr class="even_gradeX" id="11">
-			<td>Misc</td>
+			<td>110</td><td>Misc</td>
 			<td>Lynx</td>
 			<td>Text only</td>
 
@@ -529,7 +537,7 @@
 			<td class="center">X</td>
 		</tr>
 		<tr class="odd_gradeC" id="3">
-			<td>Misc</td>
+			<td>110</td><td>Misc</td>
 			<td>IE Mobile</td>
 			<td>Windows Mobile 6</td>
 
@@ -537,7 +545,7 @@
 			<td class="center">C</td>
 		</tr>
 		<tr class="even_gradeC" id="4">
-			<td>Misc</td>
+			<td>110</td><td>Misc</td>
 			<td>PSP browser</td>
 			<td>PSP</td>
 
@@ -545,7 +553,7 @@
 			<td class="center">C</td>
 		</tr>
 		<tr class="odd_gradeU" id="10">
-			<td>Other browsers</td>
+			<td>160</td><td>Other browsers</td>
 			<td>All others</td>
 			<td>-</td>
 
@@ -561,12 +569,58 @@
 			
 			
 
-			
+			<h2>Additional HTML code</h2>
+			<p>
+			In the table should be added one additional column that will be used for ordering gorups (usually column with numbers representing
+			the order of the groups). By default this column is hidden.
+			<pre>
+&lt;table id=&quot;example&quot;&gt;
+	&lt;thead&gt;
+		&lt;tr&gt;
+			&lt;th&gt;Group order by(usually hidden)&lt;/th&gt;
+			&lt;th&gt;Rendering engine&lt;/th&gt;
+			&lt;th&gt;Browser&lt;/th&gt;
+			&lt;th&gt;Platform(s)&lt;/th&gt;
+			&lt;th&gt;Engine version&lt;/th&gt;
+			&lt;th&gt;CSS grade&lt;/th&gt;
+		&lt;/tr&gt;
+	&lt;/thead&gt;
+	&lt;tbody&gt;
+		&lt;tr class=&quot;odd_gradeX&quot; id=&quot;2&quot;&gt;
+			&lt;td&gt;10&lt;/td&gt;&lt;td&gt;Trident&lt;/td&gt;
+			&lt;td&gt;Internet Explorer 4.0&lt;/td&gt;
+			&lt;td&gt;Win 95+&lt;/td&gt;
+			&lt;td class=&quot;center&quot;&gt;4&lt;/td&gt;
+			&lt;td class=&quot;center&quot;&gt;X&lt;/td&gt;
+		&lt;/tr&gt;
+		&lt;tr class=&quot;even_gradeC&quot; id=&quot;4&quot;&gt;
+			&lt;td&gt;10&lt;/td&gt;&lt;td&gt;Trident&lt;/td&gt;
+			&lt;td&gt;Internet Explorer 5.0&lt;/td&gt;
+			&lt;td&gt;Win 95+&lt;/td&gt;
+			&lt;td class=&quot;center&quot;&gt;5&lt;/td&gt;
+			&lt;td class=&quot;center&quot;&gt;C&lt;/td&gt;
+		&lt;/tr&gt;
+...
+	&lt;/tbody&gt;
+&lt;/table&gt;
+	</pre>
+
+
+			</p>
 			<h2>Initialization code</h2>
-			<p>Initialization code is very simple. You just need to add rowGrouping() call to the DataTable instance. By default 
-			the firt column is used for grouping. This column is hidden and values are added as a heading rows in each group.</p>
+			<p>In the initialization code you need to define index of the column that will be used for ordering groups 
+			<code>iGroupingOrderByColumnIndex</code> in this case set to 0. Due to the fact that grouping column is not
+			a first one it should be set to the value 1. Alternatively you can specify whether the order should be ascending
+			or descending</p>
 			<pre>$(document).ready( function () {
-		$('#example').dataTable().rowGrouping();
+			$(document).ready( function () {
+				$('#example').dataTable().rowGrouping({
+            							iGroupingColumnIndex: 1,
+            							sGroupingColumnSortDirection: "asc",
+            							iGroupingOrderByColumnIndex: 0
+								});
+				
+			} );
 }
 	</pre>
 	
