@@ -1,6 +1,6 @@
 /*
 * File:        jquery.dataTables.grouping.js
-* Version:     0.0.8.dev
+* Version:     0.0.9.dev
 * Author:      Jovan Popovic 
 * 
 * Copyright 2011 Jovan Popovic, all rights reserved.
@@ -18,7 +18,7 @@
     $.fn.rowGrouping = function (options) {
 
         function _fnGetYear(x) {
-            return x.substr(x.lastIndexOf('/') + 1, 4);
+            return x.substr(iYearIndex, 4);
         }
         function _fnGetGroupByName(x) {
             return x;
@@ -38,12 +38,13 @@
             return date.getFullYear() + " / " + date.getMonthName();
         }
 
-        oTable = this;
+        var oTable = this;
+	var iYearIndex = 6;
 
         var defaults = {
 
             iGroupingColumnIndex: 0,
-            sGroupingColumnSortDirection: "desc",
+            sGroupingColumnSortDirection: "",
             iGroupingOrderByColumnIndex: -1,
             sGrupingClass: "group",
             bHideGroupingColumn: true,
@@ -52,7 +53,10 @@
             sGroupBy: "name",
             sDateFormat: "dd/MM/yyyy",
             sEmptyGroupLabel: "-",
-	    bSetGroupingClassOnTR: false
+	    bSetGroupingClassOnTR: false,
+	    iSecondaryGroupingColumnIndex: 4,
+            sSecondaryGroupBy: "name"
+		
 
         };
 
@@ -65,11 +69,21 @@
 	    properties.bCustomColumnOrdering = true;
 	}
 
+	if(properties.sGroupingColumnSortDirection == "")
+	{
+		if(properties.sGroupBy == "year")
+			properties.sGroupingColumnSortDirection = "desc";
+		else
+			properties.sGroupingColumnSortDirection = "asc";
+	}
+
         var fnGetGroup = _fnGetGroupByName;
         switch (properties.sGroupBy) {
             case "letter": fnGetGroup = _fnGetGroupByLetter;
+		
                 break;
             case "year": fnGetGroup = _fnGetGroupByYear;
+		iYearIndex = properties.sDateFormat.toLowerCase().indexOf('yy');
                 break;
             case "month": fnGetGroup = _fnGetGroupByYearMonth;
                 break;
@@ -94,7 +108,9 @@
                 for (var i = 0; i < nTrs.length; i++) {
                     var iDisplayIndex = oSettings._iDisplayStart + i;
                     var sGroupData = oSettings.aoData[oSettings.aiDisplay[iDisplayIndex]]._aData[properties.iGroupingColumnIndex];
-		    var sGroup = fnGetGroup(sGroupData);
+		    var sGroup = sGroupData;
+		    if(properties.sGroupBy != "year")
+		    	sGroup = fnGetGroup(sGroupData);
                     if (sLastGroup == null || sGroup != sLastGroup) {
                         var nGroup = document.createElement('tr');
                         var nCell = document.createElement('td');
@@ -159,16 +175,6 @@
 		/* Create an array with the values of all the input boxes in a column */
                 oTable.fnSettings().aoColumns[properties.iGroupingOrderByColumnIndex].sSortDataType = "rg-date";
                 $.fn.dataTableExt.afnSortData['rg-date'] = function (oSettings, iColumn) {
-                    /*
-                    $(oTable.fnSettings().aaSortingFixed).each(function () {
-                    if (this[0] == iColumn) {
-                    if (this[1] == "asc")
-                    this[1] = "desc";
-                    else
-                    this[1] = "asc";
-                    }
-                    });
-                    */
                     var aData = [];
                     $('td:eq(' + iColumn + ')', oSettings.oApi._fnGetTrNodes(oSettings)).each(function () {
                         aData.push(_fnGetYear(this.innerHTML));
