@@ -5,7 +5,7 @@
 		<meta http-equiv="content-type" content="text/html; charset=UTF-8">
 		<link rel="shortcut icon" type="image/ico" href="http://www.sprymedia.co.uk/media/images/favicon.ico">
 		
-		<title>Using DataTable with row grouping plugin - Server Side Example</title>
+		<title>Using DataTable with row grouping plugin - Two Level Grouping</title>
 		<style type="text/css" title="currentStyle">
 			@import "media/css/demo_page.css";
 			@import "media/css/demo_table.css";
@@ -22,11 +22,9 @@
 
 		<script type="text/javascript" charset="utf-8">
 			$(document).ready( function () {
-				$('#example').dataTable({
-                                      "bServerSide": true,
-                                      "sAjaxSource": "server_processing.js"
-                                      
-                                    }).rowGrouping();
+				$('#example').dataTable().rowGrouping({	iGroupingColumnIndex2: 4,
+									sGroupLabelPrefix: "Rendering Engine - ",
+									sGroupLabelPrefix2: "CSS Class - "});
 				
 			} );
 		</script>
@@ -53,21 +51,21 @@
 		<div id="container">
 			<a href="index.html">Home</a>
 			<a href="http://code.google.com/p/jquery-datatables-column-filter/wiki/ColumnFilter">Wiki</a> 
-			<div class="full_width big">
+			<h1 class="full_width big">
 
-				JQuery DataTable Row Grouping - Server Side Processing
-			</div>
+				JQuery DataTable Row Grouping - Two Level Grouping
+			</h1>
 			
-			<h1>Preamble</h1>
+			<h2>Preamble</h2>
 			<p>
-				DataTables Row grouping add-in will work even if you use data tables plugin in the server side mode.
+				DataTables Row Grouping add-in can be used to group table by two levels (two different columns).
 			</p>
 
 			
 	
 			
 			
-			<h1>Live example</h1>
+			<h2>Live example</h2>
 
 
 
@@ -144,15 +142,15 @@
 			<td>Win XP</td>
 			<td class="center">6</td>
 
-			<td class="center read_only">A</td>
+			<td class="center read_only">B</td>
 		</tr>
 		<tr class="odd_gradeA" id="5">
-			<td>Gecko (UTF-8: $¢€)</td>
+			<td>Gecko</td>
 			<td>Firefox 1.0</td>
 			<td>Win 98+ / OSX.2+</td>
 			<td class="center">1.7</td>
 
-			<td class="center">A</td>
+			<td class="center">B</td>
 		</tr>
 		<tr class="even_gradeA" id="1">
 			<td>Gecko</td>
@@ -176,7 +174,7 @@
 			<td>Win 2k+ / OSX.3+</td>
 			<td class="center">1.9</td>
 
-			<td class="center">A</td>
+			<td class="center">C</td>
 		</tr>
 		<tr class="odd_gradeA" id="5">
 			<td>Gecko</td>
@@ -184,7 +182,7 @@
 			<td>OSX.2+</td>
 			<td class="center">1.8</td>
 
-			<td class="center">A</td>
+			<td class="center">C</td>
 		</tr>
 		<tr class="even_gradeA" id="1">
 			<td>Gecko</td>
@@ -192,7 +190,7 @@
 			<td>OSX.3+</td>
 			<td class="center">1.8</td>
 
-			<td class="center">A</td>
+			<td class="center">C</td>
 		</tr>
 		<tr class="odd_gradeA" id="5">
 			<td>Gecko</td>
@@ -208,7 +206,7 @@
 			<td>Win 98SE+</td>
 			<td class="center">1.7</td>
 
-			<td class="center">A</td>
+			<td class="center">C</td>
 		</tr>
 		<tr class="odd_gradeA" id="5">
 			<td>Gecko</td>
@@ -232,7 +230,7 @@
 			<td>Win 95+ / OSX.1+</td>
 			<td class="center">1.1</td>
 
-			<td class="center">A</td>
+			<td class="center">D</td>
 		</tr>
 		<tr class="even_gradeA" id="1">
 			<td>Gecko</td>
@@ -240,7 +238,7 @@
 			<td>Win 95+ / OSX.1+</td>
 			<td class="center">1.2</td>
 
-			<td class="center">A</td>
+			<td class="center">D</td>
 		</tr>
 		<tr class="odd_gradeA" id="5">
 			<td>Gecko</td>
@@ -564,31 +562,26 @@
 			
 
 			
-			<h1>Initialization code</h1>
-			<p>Initialization code is same as in the standard client side mode - you just need to add rowGrouping() call to the DataTable instance.</p>
+			<h2>Initialization code</h2>
+			<p>To initilize two-level grouping you just need to define index of the column that wil be used for second level grouping. Optionaly you can define prefixes that will be aded to grouping rows to make more difference between the primary and secondary level grouping.</p>
 			<pre>$(document).ready( function () {
-
-				$('#example').dataTable({
-                                      "bServerSide": true,
-                                      "sAjaxSource": "server_processing.js"
-                                      
-                                    }).rowGrouping();
+		$('#example').dataTable().rowGrouping({	iGroupingColumnIndex2: 4,
+									sGroupLabelPrefix: "Rendering Engine - ",
+									sGroupLabelPrefix2: "CSS Class - "});
 }
 	</pre>
 	
 
 
-			<h1>Other examples</h1>
-			<ul>
-
+			<h2>Other examples</h2>
 			<ul>
 
 				<li><a href="default.html">Basic usage</a></li>
 				<li><a href="letters.html">Group by letter</a></li>
 				<li><a href="year.html">Group by year</a></li>
 				<li><a href="customGroupOrdering.html">Custom group ordering</a></li>
-				<li><a href="serverSide.html">Server-side grouping</a></li>
-				<li><a href="collapsableGroups.html">Collapsable/Expandable groups</a></li>
+				<li><a href="ajax.html">Ajax source grouping</a></li>
+				<li><a href="collapsibleGroups.html">Collapsible/Expandable grouping</a></li>
 				<li><a href="accordion.html">Accordion Grouping</a></li>
 			</ul>
 			

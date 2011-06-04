@@ -5,7 +5,7 @@
 		<meta http-equiv="content-type" content="text/html; charset=UTF-8">
 		<link rel="shortcut icon" type="image/ico" href="http://www.sprymedia.co.uk/media/images/favicon.ico">
 		
-		<title>Using DataTable with row grouping plugin - Server Side Example</title>
+		<title>Using DataTable with row grouping plugin - Accordion Grouping</title>
 		<style type="text/css" title="currentStyle">
 			@import "media/css/demo_page.css";
 			@import "media/css/demo_table.css";
@@ -22,12 +22,8 @@
 
 		<script type="text/javascript" charset="utf-8">
 			$(document).ready( function () {
-				$('#example').dataTable({
-                                      "bServerSide": true,
-                                      "sAjaxSource": "server_processing.js"
-                                      
-                                    }).rowGrouping();
-				
+				$('#example').dataTable({ "bLengthChange": false, "bPaginate": false})
+						.rowGrouping({bExpandableGrouping: true, bExpandSingleGroup: true, iExpandGroupOffset: -1 });
 			} );
 		</script>
 <script type="text/javascript">
@@ -53,21 +49,22 @@
 		<div id="container">
 			<a href="index.html">Home</a>
 			<a href="http://code.google.com/p/jquery-datatables-column-filter/wiki/ColumnFilter">Wiki</a> 
-			<div class="full_width big">
+			<h1 class="full_width big">
 
-				JQuery DataTable Row Grouping - Server Side Processing
-			</div>
+				JQuery DataTable Row Grouping - Accordion Grouping
+			</h1>
 			
-			<h1>Preamble</h1>
+			<h2>Preamble</h2>
 			<p>
-				DataTables Row grouping add-in will work even if you use data tables plugin in the server side mode.
+				DataTables Row Grouping add-in can be used to create accordion-like grouping. In this example only one group is shown at time
+			and when you click on any other group it will be expanded but the first one will be closed.
 			</p>
 
 			
 	
 			
 			
-			<h1>Live example</h1>
+			<h2>Live example</h2>
 
 
 
@@ -147,7 +144,7 @@
 			<td class="center read_only">A</td>
 		</tr>
 		<tr class="odd_gradeA" id="5">
-			<td>Gecko (UTF-8: $¢€)</td>
+			<td>Gecko</td>
 			<td>Firefox 1.0</td>
 			<td>Win 98+ / OSX.2+</td>
 			<td class="center">1.7</td>
@@ -564,31 +561,30 @@
 			
 
 			
-			<h1>Initialization code</h1>
-			<p>Initialization code is same as in the standard client side mode - you just need to add rowGrouping() call to the DataTable instance.</p>
+			<h2>Initialization code</h2>
+			<p>To initialize add-on as acordion group you need to pass bExpandSingleGroup: true parameter. Optionally you can set offset to -1
+			so position of the window scroll will be fixed on the start of the table. This is usefull if your tabe do not have lot of groups.</p>
 			<pre>$(document).ready( function () {
 
-				$('#example').dataTable({
-                                      "bServerSide": true,
-                                      "sAjaxSource": "server_processing.js"
-                                      
-                                    }).rowGrouping();
+				$('#example').dataTable({ "bLengthChange": false, "bPaginate": false})
+						.rowGrouping({	bExpandableGrouping: true, 
+								bExpandSingleGroup: true,
+								iExpandGroupOffset: -1 });
+			
 }
 	</pre>
 	
 
 
-			<h1>Other examples</h1>
-			<ul>
-
+			<h2>Other examples</h2>
 			<ul>
 
 				<li><a href="default.html">Basic usage</a></li>
 				<li><a href="letters.html">Group by letter</a></li>
 				<li><a href="year.html">Group by year</a></li>
 				<li><a href="customGroupOrdering.html">Custom group ordering</a></li>
-				<li><a href="serverSide.html">Server-side grouping</a></li>
-				<li><a href="collapsableGroups.html">Collapsable/Expandable groups</a></li>
+				<li><a href="ajax.html">Ajax sorce grouping</a></li>
+				<li><a href="collapsibleGroups.html">Collapsible/Expandable grouping</a></li>
 				<li><a href="accordion.html">Accordion Grouping</a></li>
 			</ul>
 			
