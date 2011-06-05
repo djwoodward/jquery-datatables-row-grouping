@@ -189,7 +189,7 @@
                         var nGroup = document.createElement('tr');
                         var nCell = document.createElement('td');
 
-                        nGroup.id = "group-id-" + sGroup.toLowerCase().replace(" ", "-");
+                        nGroup.id = "group-id-" + oTable.attr("id") + "-" + sGroup.toLowerCase().replace(" ", "-");
 
                         if (properties.bSetGroupingClassOnTR) {
                             nGroup.className = properties.sGrupingClass + " " + sGroup.toLowerCase().replace(" ", "-");
@@ -234,7 +234,7 @@
                                         $(this).removeClass("collapsed-group");
                                         properties.sCurrentGroup = sGroup;
                                         if (properties.iExpandGroupOffset != -1) {
-                                            var position = $("#group-id-" + sGroup).offset().top - properties.iExpandGroupOffset;
+                                            var position = $("#group-id-" + oTable.attr("id") + "-" + sGroup).offset().top - properties.iExpandGroupOffset;
                                             window.scroll(0, position);
                                         } else {
                                             var position = oTable.offset().top;
