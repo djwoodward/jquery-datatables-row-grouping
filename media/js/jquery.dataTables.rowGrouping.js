@@ -1,6 +1,6 @@
 /*
 * File:        jquery.dataTables.grouping.js
-* Version:     0.2.
+* Version:     0.3.
 * Author:      Jovan Popovic 
 * 
 * Copyright 2011 Jovan Popovic, all rights reserved.
@@ -210,7 +210,7 @@
                                 nCell.className += " group-item-expander expanded-group";
                             }
                             nCell.rel = sGroup.toLowerCase().replace(" ", "-");
-                            //nCell.innerHTML += "<a href='#' class='group-item-expander expanded-group' rel='" + sGroup + "' >TEST</a>";
+
 
                             ///*************
 
@@ -224,8 +224,8 @@
                                 if (properties.bExpandSingleGroup) {
                                     if (!bIsExpanded) {
 
-                                        $("tr.group-item-" + sCurrentGroup).hide();
-                                        $("tr.group-item-" + sGroup).show();
+                                        $(".group-item-" + sCurrentGroup, oTable).hide();
+                                        $(".group-item-" + sGroup, oTable).show();
 
                                         var oTrExpandedGroup = $(".expanded-group");
                                         oTrExpandedGroup.removeClass("expanded-group");
@@ -245,11 +245,11 @@
                                     if (bIsExpanded) {
                                         $(this).removeClass("expanded-group");
                                         $(this).addClass("collapsed-group");
-                                        $("tr.group-item-" + sGroup).hide();
+                                        $(".group-item-" + sGroup, oTable).hide();
                                     } else {
                                         $(this).addClass("expanded-group");
                                         $(this).removeClass("collapsed-group");
-                                        $("tr.group-item-" + sGroup).show();
+                                        $(".group-item-" + sGroup, oTable).show();
                                     }
                                 }
                                 e.preventDefault();
