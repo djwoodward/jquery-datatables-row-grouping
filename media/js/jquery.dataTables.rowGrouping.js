@@ -1,6 +1,6 @@
 /*
 * File:        jquery.dataTables.grouping.js
-* Version:     0.3.
+* Version:     0.5.
 * Author:      Jovan Popovic 
 * 
 * Copyright 2011 Jovan Popovic, all rights reserved.
@@ -37,12 +37,18 @@
 * @bHideGroupingOrderByColumn2                          Boolean             Hide column used for ordering secondary groups once results are grouped. Default - true,
 * @sGroupBy2                                            Enumeration         Type of grouping that should be applied to secondary column. Values "name"(default), "letter", "year",
 * @sGroupLabelPrefix2                                   String              Prefix that will be added to each secondary group cell
-* 
+* @fnOnGrouped                                          Function            Function that is called when grouping is finished. Function has no parameters.
 */
 (function ($) {
 
     $.fn.rowGrouping = function (options) {
 
+        function _fnOnGrouped() {
+
+        }
+        function _fnIsGroupExpanded(sGroup) {
+            return ($.inArray(sGroup, asExpandedGroups) != -1);
+        }
         function _fnGetYear(x) {
             return x.substr(iYearIndex, 4);
         }
@@ -66,7 +72,8 @@
 
         var oTable = this;
         var iYearIndex = 6;
-
+        var asExpandedGroups = new Array();
+        var bInitialGrouping = true;
         var defaults = {
 
             iGroupingColumnIndex: 0,
@@ -80,6 +87,7 @@
             bExpandableGrouping: false,
             bExpandSingleGroup: false,
             iExpandGroupOffset: 100,
+            asExpandedGroups: null,
 
             sDateFormat: "dd/MM/yyyy",
             sEmptyGroupLabel: "-",
@@ -93,7 +101,9 @@
             bHideGroupingOrderByColumn2: true,
             sGroupBy2: "name",
             sGroupLabelPrefix2: "",
-            bExpandableGrouping2: false
+            bExpandableGrouping2: false,
+
+            fnOnGrouped: _fnOnGrouped
 
 
         };
@@ -127,6 +137,15 @@
                 properties.sGroupingColumnSortDirection2 = "desc";
             else
                 properties.sGroupingColumnSortDirection2 = "asc";
+        }
+
+        if (properties.asExpandedGroups != null) {
+            for (var i = 0; i < properties.asExpandedGroups.length; i++) {
+                asExpandedGroups.push(properties.asExpandedGroups[i].toLowerCase().replace(" ", "-"));
+                if (properties.bExpandSingleGroup)
+                    break;
+            }
+            bInitialGrouping = false;
         }
 
         iYearIndex = properties.sDateFormat.toLowerCase().indexOf('yy');
@@ -182,34 +201,41 @@
                     }
 
                     if (sLastGroup == null || sGroup != sLastGroup) {
-                        if (properties.bExpandableGrouping && sLastGroup == null)
-                            properties.sCurrentGroup = sGroup;
+                        var sGroupCleaned = sGroup.toLowerCase().replace(" ", "-");
+
+                        if (properties.bExpandableGrouping && bInitialGrouping) {
+                            if (properties.bExpandSingleGroup) {
+                                if (asExpandedGroups.length == 0)
+                                    asExpandedGroups.push(sGroupCleaned);
+                            } else {
+                                asExpandedGroups.push(sGroupCleaned);
+                            }
+                        }
 
 
                         var nGroup = document.createElement('tr');
                         var nCell = document.createElement('td');
 
-                        nGroup.id = "group-id-" + oTable.attr("id") + "-" + sGroup.toLowerCase().replace(" ", "-");
+                        nGroup.id = "group-id-" + oTable.attr("id") + "-" + sGroupCleaned;
 
                         if (properties.bSetGroupingClassOnTR) {
-                            nGroup.className = properties.sGrupingClass + " " + sGroup.toLowerCase().replace(" ", "-");
+                            nGroup.className = properties.sGrupingClass + " " + sGroupCleaned;
                         } else {
-                            nCell.className = properties.sGrupingClass + " " + sGroup.toLowerCase().replace(" ", "-");
+                            nCell.className = properties.sGrupingClass + " " + sGroupCleaned;
                         }
 
                         nCell.colSpan = iColspan;
                         nCell.innerHTML = properties.sGroupLabelPrefix + (sGroup == "" ? properties.sEmptyGroupLabel : sGroup);
                         if (properties.bExpandableGrouping) {
-                            if (properties.bExpandSingleGroup) {
-                                if (properties.sCurrentGroup != sGroup) {
-                                    nCell.className += " group-item-expander collapsed-group";
-                                } else {
-                                    nCell.className += " group-item-expander expanded-group";
-                                }
+
+
+                            if (_fnIsGroupExpanded(sGroupCleaned)) {
+                                nCell.className += " expanded-group";
                             } else {
-                                nCell.className += " group-item-expander expanded-group";
+                                nCell.className += " collapsed-group";
                             }
-                            nCell.rel = sGroup.toLowerCase().replace(" ", "-");
+                            nCell.className += " group-item-expander";
+                            nCell.rel = sGroupCleaned;
 
 
                             ///*************
@@ -219,10 +245,13 @@
 
 
                                 var sGroup = $(this).attr("rel");
-                                var sCurrentGroup = properties.sCurrentGroup.toLowerCase().replace(" ", "-");
-                                var bIsExpanded = $(this).hasClass("expanded-group");
+
+                                var bIsExpanded = _fnIsGroupExpanded(sGroup);
                                 if (properties.bExpandSingleGroup) {
                                     if (!bIsExpanded) {
+                                        var sCurrentGroup = asExpandedGroups[0];
+                                        asExpandedGroups = new Array();
+                                        asExpandedGroups.push(sGroup);
 
                                         $(".group-item-" + sCurrentGroup, oTable).hide();
                                         $(".group-item-" + sGroup, oTable).show();
@@ -232,7 +261,6 @@
                                         oTrExpandedGroup.addClass("collapsed-group");
                                         $(this).addClass("expanded-group");
                                         $(this).removeClass("collapsed-group");
-                                        properties.sCurrentGroup = sGroup;
                                         if (properties.iExpandGroupOffset != -1) {
                                             var position = $("#group-id-" + oTable.attr("id") + "-" + sGroup).offset().top - properties.iExpandGroupOffset;
                                             window.scroll(0, position);
@@ -243,10 +271,13 @@
                                     }
                                 } else {
                                     if (bIsExpanded) {
+                                        var index = $.inArray(sGroup, asExpandedGroups);
+                                        asExpandedGroups.splice(index, 1);
                                         $(this).removeClass("expanded-group");
                                         $(this).addClass("collapsed-group");
                                         $(".group-item-" + sGroup, oTable).hide();
                                     } else {
+                                        asExpandedGroups.push(sGroup);
                                         $(this).addClass("expanded-group");
                                         $(this).removeClass("collapsed-group");
                                         $(".group-item-" + sGroup, oTable).show();
@@ -281,12 +312,13 @@
 
                     } // end if (sLastGroup == null || sGroup != sLastGroup)
 
-
-                    if (properties.bExpandableGrouping && properties.bExpandSingleGroup) {
-                        if (sGroup != properties.sCurrentGroup) {
+                    if (properties.bExpandableGrouping) {
+                        $(nTrs[i]).addClass("group-item-" + sGroupCleaned);
+                        if (/*properties.bExpandSingleGroup &&*/!_fnIsGroupExpanded(sGroupCleaned)) {
                             $(nTrs[i]).hide();
                         }
                     }
+
 
                     if (bUseSecondaryGrouping) {
 
@@ -311,22 +343,15 @@
 
                     } //end if (bUseSecondaryGrouping)
 
-                    if (properties.bExpandableGrouping) {
 
-                        $(nTrs[i]).addClass("group-item-" + sGroup.toLowerCase().replace(" ", "-"));
-                    }
 
                 } // end for (var i = 0; i < nTrs.length; i++)
 
 
                 //-----End grouping
+                properties.fnOnGrouped();
 
-                //Add click handlers on the groups
-                if (properties.bExpandableGrouping) {
-
-
-                }
-
+                bInitialGrouping = false;
             };
 
 

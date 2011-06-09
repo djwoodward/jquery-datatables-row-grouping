@@ -23,7 +23,10 @@
 		<script type="text/javascript" charset="utf-8">
 			$(document).ready( function () {
 				$('#example').dataTable({ "bLengthChange": false, "bPaginate": false})
-						.rowGrouping({bExpandableGrouping: true, bExpandSingleGroup: true, iExpandGroupOffset: -1 });
+						.rowGrouping({	bExpandableGrouping: true,
+								bExpandSingleGroup: true,
+								iExpandGroupOffset: -1,
+								asExpandedGroups: ["KHtml"]});
 			} );
 		</script>
 <script type="text/javascript">
@@ -586,6 +589,7 @@
 				<li><a href="ajax.html">Ajax sorce grouping</a></li>
 				<li><a href="collapsibleGroups.html">Collapsible/Expandable grouping</a></li>
 				<li><a href="accordion.html">Accordion Grouping</a></li>
+				<li><a href="customization.html">Add-in customization</a></li>
 			</ul>
 			
 			<div id="footer" style="text-align:center;">

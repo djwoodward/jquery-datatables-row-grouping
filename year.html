@@ -563,10 +563,11 @@
 
 			
 			<h2>Initialization code</h2>
-			<p>Initialization code is very simple. You just need to add rowGrouping() call to the DataTable instance. By default 
-			the firt column is used for grouping. This column is hidden and values are added as a heading rows in each group.</p>
+			<p>To group rows by the year you just need to set sGroupBy parameter to "year". In this example is set column 5 for grouping.</p>
 			<pre>$(document).ready( function () {
-		$('#example').dataTable().rowGrouping();
+		$('#example').dataTable().rowGrouping({	iGroupingColumnIndex:5,
+							sGroupBy: "year",
+							bHideGroupingColumn: false});
 }
 	</pre>
 	
@@ -582,6 +583,7 @@
 				<li><a href="ajax.html">Ajax source grouping</a></li>
 				<li><a href="collapsibleGroups.html">Collapsible/Expandable groups</a></li>
 				<li><a href="accordion.html">Accordion Grouping</a></li>
+				<li><a href="customization.html">Add-in customization</a></li>
 			</ul>
 			
 			
