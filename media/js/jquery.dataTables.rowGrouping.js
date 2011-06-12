@@ -1,6 +1,6 @@
 /*
 * File:        jquery.dataTables.grouping.js
-* Version:     0.5.
+* Version:     0.7.
 * Author:      Jovan Popovic 
 * 
 * Copyright 2011 Jovan Popovic, all rights reserved.
@@ -46,34 +46,12 @@
         function _fnOnGrouped() {
 
         }
-        function _fnIsGroupExpanded(sGroup) {
-            return ($.inArray(sGroup, asExpandedGroups) != -1);
-        }
-        function _fnGetYear(x) {
-            return x.substr(iYearIndex, 4);
-        }
-        function _fnGetGroupByName(x) {
-            return x;
+
+        function _getMonthName(iMonth) {
+            var asMonths = ["January", "February", "March", "April", "May", "June", "Jully", "August", "September", "October", "November", "December"];
+            return asMonths[iMonth - 1];
         }
 
-        function _fnGetGroupByLetter(x) {
-            return x.substr(0, 1);
-        }
-
-        function _fnGetGroupByYear(x) {
-            return _fnGetYear(x);
-            //return Date.parseExact(x, properties.sDateFormat).getFullYear();//slooooow
-        }
-
-        function _fnGetGroupByYearMonth(x) {
-            var date = Date.parseExact(x, "dd/MM/yyyy");
-            return date.getFullYear() + " / " + date.getMonthName();
-        }
-
-        var oTable = this;
-        var iYearIndex = 6;
-        var asExpandedGroups = new Array();
-        var bInitialGrouping = true;
         var defaults = {
 
             iGroupingColumnIndex: 0,
@@ -108,61 +86,119 @@
 
         };
 
-        properties = $.extend(defaults, options);
 
-        if (properties.iGroupingOrderByColumnIndex == -1) {
-            properties.bCustomColumnOrdering = false;
-            properties.iGroupingOrderByColumnIndex = properties.iGroupingColumnIndex;
-        } else {
-            properties.bCustomColumnOrdering = true;
-        }
+        return this.each(function (index, elem) {
 
-        if (properties.sGroupingColumnSortDirection == "") {
-            if (properties.sGroupBy == "year")
-                properties.sGroupingColumnSortDirection = "desc";
-            else
-                properties.sGroupingColumnSortDirection = "asc";
-        }
+            var oTable = $(elem).dataTable();
+            function _fnIsGroupExpanded(sGroup) {
+                return ($.inArray(sGroup, asExpandedGroups) != -1);
+            }
+            function _fnGetYear(x) {
+                return x.substr(iYearIndex, iYearLength);
+            }
+            function _fnGetGroupByName(x) {
+                return x;
+            }
+
+            function _fnGetGroupByLetter(x) {
+                return x.substr(0, 1);
+            }
+
+            function _fnGetGroupByYear(x) {
+                return _fnGetYear(x);
+                //return Date.parseExact(x, properties.sDateFormat).getFullYear();//slooooow
+            }
+
+            function _fnGetGroupByYearMonth(x) {
+                //var date = Date.parseExact(x, "dd/MM/yyyy");
+                //return date.getFullYear() + " / " + date.getMonthName();
+                //return x.substr(iYearIndex, iYearLength) + '/' + x.substr(iMonthIndex, iMonthLength);
+                return x.substr(iYearIndex, iYearLength) + ' ' + _getMonthName(x.substr(iMonthIndex, iMonthLength));
+            }
+
+            function _fnGetCleanedGroup(sGroup) {
+                return sGroup.toLowerCase().replace(" ", "-");
+            }
+
+            //var oTable = this;
+            var iYearIndex = 6;
+            var iYearLength = 4;
+            var asExpandedGroups = new Array();
+            var bInitialGrouping = true;
+
+            var properties = $.extend(defaults, options);
+
+            if (properties.iGroupingOrderByColumnIndex == -1) {
+                properties.bCustomColumnOrdering = false;
+                properties.iGroupingOrderByColumnIndex = properties.iGroupingColumnIndex;
+            } else {
+                properties.bCustomColumnOrdering = true;
+            }
+
+            if (properties.sGroupingColumnSortDirection == "") {
+                if (properties.sGroupBy == "year")
+                    properties.sGroupingColumnSortDirection = "desc";
+                else
+                    properties.sGroupingColumnSortDirection = "asc";
+            }
 
 
-        if (properties.iGroupingOrderByColumnIndex2 == -1) {
-            properties.bCustomColumnOrdering2 = false;
-            properties.iGroupingOrderByColumnIndex2 = properties.iGroupingColumnIndex2;
-        } else {
-            properties.bCustomColumnOrdering2 = true;
-        }
+            if (properties.iGroupingOrderByColumnIndex2 == -1) {
+                properties.bCustomColumnOrdering2 = false;
+                properties.iGroupingOrderByColumnIndex2 = properties.iGroupingColumnIndex2;
+            } else {
+                properties.bCustomColumnOrdering2 = true;
+            }
 
-        if (properties.sGroupingColumnSortDirection2 == "") {
-            if (properties.sGroupBy2 == "year")
-                properties.sGroupingColumnSortDirection2 = "desc";
-            else
-                properties.sGroupingColumnSortDirection2 = "asc";
-        }
+            if (properties.sGroupingColumnSortDirection2 == "") {
+                if (properties.sGroupBy2 == "year")
+                    properties.sGroupingColumnSortDirection2 = "desc";
+                else
+                    properties.sGroupingColumnSortDirection2 = "asc";
+            }
 
-        if (properties.asExpandedGroups != null) {
-            for (var i = 0; i < properties.asExpandedGroups.length; i++) {
-                asExpandedGroups.push(properties.asExpandedGroups[i].toLowerCase().replace(" ", "-"));
-                if (properties.bExpandSingleGroup)
+            if (properties.asExpandedGroups != null) {
+                if (properties.asExpandedGroups == "NONE") {
+                    properties.asExpandedGroups = [];
+                    asExpandedGroups = properties.asExpandedGroups;
+                    bInitialGrouping = false;
+                } else if (properties.asExpandedGroups == "ALL") {
+
+                } else if (properties.asExpandedGroups.constructor == String) {
+                    var currentGroup = properties.asExpandedGroups;
+                    properties.asExpandedGroups = new Array();
+                    properties.asExpandedGroups.push(_fnGetCleanedGroup(currentGroup));
+                    asExpandedGroups = properties.asExpandedGroups;
+                    bInitialGrouping = false;
+                } else if (properties.asExpandedGroups.constructor == Array) {
+                    for (var i = 0; i < properties.asExpandedGroups.length; i++) {
+                        asExpandedGroups.push(_fnGetCleanedGroup(properties.asExpandedGroups[i]));
+                        if (properties.bExpandSingleGroup)
+                            break;
+                    }
+                    bInitialGrouping = false;
+                }
+            }
+
+            iYearIndex = properties.sDateFormat.toLowerCase().indexOf('yy');
+            iYearLength = properties.sDateFormat.toLowerCase().lastIndexOf('y') - properties.sDateFormat.toLowerCase().indexOf('y') + 1;
+
+            iMonthIndex = properties.sDateFormat.toLowerCase().indexOf('mm');
+            iMonthLength = properties.sDateFormat.toLowerCase().lastIndexOf('m') - properties.sDateFormat.toLowerCase().indexOf('m') + 1;
+
+            var fnGetGroup = _fnGetGroupByName;
+            switch (properties.sGroupBy) {
+                case "letter": fnGetGroup = _fnGetGroupByLetter;
+                    break;
+                case "year": fnGetGroup = _fnGetGroupByYear;
+                    break;
+                case "month": fnGetGroup = _fnGetGroupByYearMonth;
+                    break;
+                default: fnGetGroup = _fnGetGroupByName;
                     break;
             }
-            bInitialGrouping = false;
-        }
 
-        iYearIndex = properties.sDateFormat.toLowerCase().indexOf('yy');
 
-        var fnGetGroup = _fnGetGroupByName;
-        switch (properties.sGroupBy) {
-            case "letter": fnGetGroup = _fnGetGroupByLetter;
-                break;
-            case "year": fnGetGroup = _fnGetGroupByYear;
-                break;
-            case "month": fnGetGroup = _fnGetGroupByYearMonth;
-                break;
-            default: fnGetGroup = _fnGetGroupByName;
-                break;
-        }
-
-        return this.each(function () {
 
 
             var _fnDrawCallBackWithGrouping = function (oSettings) {
@@ -201,7 +237,7 @@
                     }
 
                     if (sLastGroup == null || sGroup != sLastGroup) {
-                        var sGroupCleaned = sGroup.toLowerCase().replace(" ", "-");
+                        var sGroupCleaned = _fnGetCleanedGroup(sGroup);
 
                         if (properties.bExpandableGrouping && bInitialGrouping) {
                             if (properties.bExpandSingleGroup) {
