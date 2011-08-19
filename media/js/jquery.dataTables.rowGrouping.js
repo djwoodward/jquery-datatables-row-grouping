@@ -1,6 +1,6 @@
 /*
 * File:        jquery.dataTables.grouping.js
-* Version:     1.0.
+* Version:     1.1.
 * Author:      Jovan Popovic 
 * 
 * Copyright 2011 Jovan Popovic, all rights reserved.
@@ -15,7 +15,7 @@
 * @iGroupingColumnIndex                                 Integer             Index of the column that will be used for grouping - default 0
 * @sGroupingColumnSortDirection                         Enumeration         Sort direction of the group
 * @iGroupingOrderByColumnIndex                          Integer             Index of the column that will be used for ordering groups
-* @sGrupingClass                                        String              Class that will be associated to the group row. Default - "group"
+* @sGroupingClass                                       String              Class that will be associated to the group row. Default - "group"
 * @bSetGroupingClassOnTR                                Boolean             If set class will be set to the TR instead of the TD withing the grouping TR
 * @bHideGroupingColumn                                  Boolean             Hide column used for grouping once results are grouped. Default - true
 * @bHideGroupingOrderByColumn                           Boolean             Hide column used for ordering groups once results are grouped. Default - true
@@ -32,7 +32,7 @@
 * @iGroupingColumnIndex2                                Integer             Index of the secondary column that will be used for grouping - default 0
 * @sGroupingColumnSortDirection2                        Enumeration         Sort direction of the secondary group
 * @iGroupingOrderByColumnIndex2                         Integer             Index of the column that will be used for ordering secondary groups
-* @sGrupingClass2                                       String              Class that will be associated to the secondary group row. Default "subgroup"
+* @sGroupingClass2                                      String              Class that will be associated to the secondary group row. Default "subgroup"
 * @bHideGroupingColumn2                                 Boolean             Hide column used for secondary grouping once results are grouped. Default - true,
 * @bHideGroupingOrderByColumn2                          Boolean             Hide column used for ordering secondary groups once results are grouped. Default - true,
 * @sGroupBy2                                            Enumeration         Type of grouping that should be applied to secondary column. Values "name"(default), "letter", "year",
@@ -57,7 +57,7 @@
             iGroupingColumnIndex: 0,
             sGroupingColumnSortDirection: "",
             iGroupingOrderByColumnIndex: -1,
-            sGrupingClass: "group",
+            sGroupingClass: "group",
             bHideGroupingColumn: true,
             bHideGroupingOrderByColumn: true,
             sGroupBy: "name",
@@ -74,7 +74,7 @@
             iGroupingColumnIndex2: -1,
             sGroupingColumnSortDirection2: "",
             iGroupingOrderByColumnIndex2: -1,
-            sGrupingClass2: "subgroup",
+            sGroupingClass2: "subgroup",
             bHideGroupingColumn2: true,
             bHideGroupingOrderByColumn2: true,
             sGroupBy2: "name",
@@ -117,7 +117,8 @@
             }
 
             function _fnGetCleanedGroup(sGroup) {
-                return sGroup.toLowerCase().replace(" ", "-");
+                //return sGroup.toLowerCase().replace(" ", "-");
+                return sGroup.toLowerCase().replace(/\s/g, "-");//Fix provided by danilo.t (Issue 3)
             }
 
             //var oTable = this;
@@ -127,6 +128,9 @@
             var bInitialGrouping = true;
 
             var properties = $.extend(defaults, options);
+
+            if (properties.sGrupingClass != null || properties.sGrupingClass2 != null)
+                alert("Since the version 1.1. sGrupingClass sGrupingClass2 are renamed to sGroupingClass and sGroupingClass2. Please correct your settings");
 
             if (properties.iGroupingOrderByColumnIndex == -1) {
                 properties.bCustomColumnOrdering = false;
@@ -255,9 +259,9 @@
                         nGroup.id = "group-id-" + oTable.attr("id") + "-" + sGroupCleaned;
 
                         if (properties.bSetGroupingClassOnTR) {
-                            nGroup.className = properties.sGrupingClass + " " + sGroupCleaned;
+                            nGroup.className = properties.sGroupingClass + " " + sGroupCleaned;
                         } else {
-                            nCell.className = properties.sGrupingClass + " " + sGroupCleaned;
+                            nCell.className = properties.sGroupingClass + " " + sGroupCleaned;
                         }
 
                         nCell.colSpan = iColspan;
@@ -271,8 +275,8 @@
                                 nCell.className += " collapsed-group";
                             }
                             nCell.className += " group-item-expander";
-                            nCell.rel = sGroupCleaned;
-
+                            //nCell.rel = sGroupCleaned;
+                            $(nCell).attr('rel', sGroupCleaned);
 
                             ///*************
 
@@ -363,9 +367,9 @@
                             var nCell2 = document.createElement('td');
 
                             if (properties.bSetGroupingClassOnTR) {
-                                nGroup2.className = properties.sGrupingClass2 + " " + sGroup2.toLowerCase().replace(" ", "-");
+                                nGroup2.className = properties.sGroupingClass2 + " " + sGroup2.toLowerCase().replace(" ", "-");
                             } else {
-                                nCell2.className = properties.sGrupingClass2 + " " + sGroup2.toLowerCase().replace(" ", "-");
+                                nCell2.className = properties.sGroupingClass2 + " " + sGroup2.toLowerCase().replace(" ", "-");
                             }
 
                             nCell2.colSpan = iColspan;
