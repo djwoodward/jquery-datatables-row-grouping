@@ -1,6 +1,6 @@
 /*
 * File:        jquery.dataTables.grouping.js
-* Version:     1.1.
+* Version:     1.1.1.
 * Author:      Jovan Popovic 
 * 
 * Copyright 2011 Jovan Popovic, all rights reserved.
@@ -118,7 +118,8 @@
 
             function _fnGetCleanedGroup(sGroup) {
                 //return sGroup.toLowerCase().replace(" ", "-");
-                return sGroup.toLowerCase().replace(/\s/g, "-");//Fix provided by danilo.t (Issue 3)
+                //return sGroup.toLowerCase().replace(/\s/g, "-"); //Fix provided by danilo.t (Issue 3)
+                return sGroup.toLowerCase().replace(/\W/g, "-"); //Fix provided by bmathews (Issue 7)
             }
 
             //var oTable = this;
@@ -276,7 +277,7 @@
                             }
                             nCell.className += " group-item-expander";
                             //nCell.rel = sGroupCleaned;
-                            $(nCell).attr('rel', sGroupCleaned);
+                            $(nCell).attr('rel', sGroupCleaned); //Fix provided by mssskhalsa (Issue 5)
 
                             ///*************
 
