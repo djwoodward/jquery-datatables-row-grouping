@@ -1,6 +1,6 @@
 /*
 * File:        jquery.dataTables.grouping.js
-* Version:     1.1.1.
+* Version:     1.1.2.
 * Author:      Jovan Popovic 
 * 
 * Copyright 2011 Jovan Popovic, all rights reserved.
@@ -122,6 +122,55 @@
                 return sGroup.toLowerCase().replace(/\W/g, "-"); //Fix provided by bmathews (Issue 7)
             }
 
+            var _fnOnGroupClick = function (e) {
+                ///<summary>
+                ///Function that is called when user click on the group cell in order to
+                ///expand of collapse group
+                ///</summary>
+
+                var sGroup = $(this).attr("rel");
+
+                var bIsExpanded = _fnIsGroupExpanded(sGroup);
+                if (properties.bExpandSingleGroup) {
+                    if (!bIsExpanded) {
+                        var sCurrentGroup = asExpandedGroups[0];
+                        asExpandedGroups = new Array();
+                        asExpandedGroups.push(sGroup);
+
+                        $(".group-item-" + sCurrentGroup, oTable).hide();
+                        $(".group-item-" + sGroup, oTable).show();
+
+                        var oTrExpandedGroup = $(".expanded-group");
+                        oTrExpandedGroup.removeClass("expanded-group");
+                        oTrExpandedGroup.addClass("collapsed-group");
+                        $(this).addClass("expanded-group");
+                        $(this).removeClass("collapsed-group");
+                        if (properties.iExpandGroupOffset != -1) {
+                            var position = $("#group-id-" + oTable.attr("id") + "-" + sGroup).offset().top - properties.iExpandGroupOffset;
+                            window.scroll(0, position);
+                        } else {
+                            var position = oTable.offset().top;
+                            window.scroll(0, position);
+                        }
+                    }
+                } else {
+                    if (bIsExpanded) {
+                        var index = $.inArray(sGroup, asExpandedGroups);
+                        asExpandedGroups.splice(index, 1);
+                        $(this).removeClass("expanded-group");
+                        $(this).addClass("collapsed-group");
+                        $(".group-item-" + sGroup, oTable).hide();
+                    } else {
+                        asExpandedGroups.push(sGroup);
+                        $(this).addClass("expanded-group");
+                        $(this).removeClass("collapsed-group");
+                        $(".group-item-" + sGroup, oTable).show();
+                    }
+                }
+                e.preventDefault();
+
+            }; //end function _fnOnGroupClick
+
             //var oTable = this;
             var iYearIndex = 6;
             var iYearLength = 4;
@@ -208,6 +257,8 @@
 
             var _fnDrawCallBackWithGrouping = function (oSettings) {
 
+                if (oTable.fnSettings().oFeatures.bServerSide)
+                    bInitialGrouping = true;
                 var bUseSecondaryGrouping = false;
 
                 if (properties.iGroupingColumnIndex2 != -1)
@@ -225,6 +276,8 @@
                 var sLastGroup2 = null;
                 for (var i = 0; i < nTrs.length; i++) {
                     var iDisplayIndex = oSettings._iDisplayStart + i;
+                    if (oTable.fnSettings().oFeatures.bServerSide)
+                        iDisplayIndex = i;
                     var sGroupData = "";
                     var sGroup = null;
                     var sGroupData2 = "";
@@ -282,52 +335,8 @@
                             ///*************
 
 
-                            $(nCell).click(function (e) {
-
-
-                                var sGroup = $(this).attr("rel");
-
-                                var bIsExpanded = _fnIsGroupExpanded(sGroup);
-                                if (properties.bExpandSingleGroup) {
-                                    if (!bIsExpanded) {
-                                        var sCurrentGroup = asExpandedGroups[0];
-                                        asExpandedGroups = new Array();
-                                        asExpandedGroups.push(sGroup);
-
-                                        $(".group-item-" + sCurrentGroup, oTable).hide();
-                                        $(".group-item-" + sGroup, oTable).show();
-
-                                        var oTrExpandedGroup = $(".expanded-group");
-                                        oTrExpandedGroup.removeClass("expanded-group");
-                                        oTrExpandedGroup.addClass("collapsed-group");
-                                        $(this).addClass("expanded-group");
-                                        $(this).removeClass("collapsed-group");
-                                        if (properties.iExpandGroupOffset != -1) {
-                                            var position = $("#group-id-" + oTable.attr("id") + "-" + sGroup).offset().top - properties.iExpandGroupOffset;
-                                            window.scroll(0, position);
-                                        } else {
-                                            var position = oTable.offset().top;
-                                            window.scroll(0, position);
-                                        }
-                                    }
-                                } else {
-                                    if (bIsExpanded) {
-                                        var index = $.inArray(sGroup, asExpandedGroups);
-                                        asExpandedGroups.splice(index, 1);
-                                        $(this).removeClass("expanded-group");
-                                        $(this).addClass("collapsed-group");
-                                        $(".group-item-" + sGroup, oTable).hide();
-                                    } else {
-                                        asExpandedGroups.push(sGroup);
-                                        $(this).addClass("expanded-group");
-                                        $(this).removeClass("collapsed-group");
-                                        $(".group-item-" + sGroup, oTable).show();
-                                    }
-                                }
-                                e.preventDefault();
-
-                            }
-                    );
+                            $(nCell).click(_fnOnGroupClick);
+                    
 
 
 
