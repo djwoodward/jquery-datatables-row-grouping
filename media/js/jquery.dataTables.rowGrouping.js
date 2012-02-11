@@ -1,6 +1,6 @@
 /*
 * File:        jquery.dataTables.grouping.js
-* Version:     1.1.2.
+* Version:     1.1.3.
 * Author:      Jovan Popovic 
 * 
 * Copyright 2011 Jovan Popovic, all rights reserved.
@@ -119,7 +119,7 @@
             function _fnGetCleanedGroup(sGroup) {
                 //return sGroup.toLowerCase().replace(" ", "-");
                 //return sGroup.toLowerCase().replace(/\s/g, "-"); //Fix provided by danilo.t (Issue 3)
-                return sGroup.toLowerCase().replace(/\W/g, "-"); //Fix provided by bmathews (Issue 7)
+                return sGroup.toLowerCase().replace(/\W+/g, "-"); //Fix provided by bmathews (Issue 7)
             }
 
             var _fnOnGroupClick = function (e) {
@@ -294,7 +294,7 @@
                             sGroup2 = fnGetGroup(sGroupData2);
                     }
 
-                    if (sLastGroup == null || sGroup != sLastGroup) {
+                    if (sLastGroup == null || _fnGetCleanedGroup(sGroup) != _fnGetCleanedGroup(sLastGroup)) {
                         var sGroupCleaned = _fnGetCleanedGroup(sGroup);
 
                         if (properties.bExpandableGrouping && bInitialGrouping) {
@@ -372,7 +372,7 @@
 
                     if (bUseSecondaryGrouping) {
 
-                        if (sLastGroup2 == null || sGroup2 != sLastGroup2) {
+                        if (sLastGroup2 == null || _fnGetCleanedGroup(sGroup2) != _fnGetCleanedGroup(sLastGroup2)) {
                             var nGroup2 = document.createElement('tr');
                             var nCell2 = document.createElement('td');
 
@@ -419,7 +419,7 @@
             }
             oTable.fnSettings().aoDrawCallback.push({
                 "fn": _fnDrawCallBackWithGrouping,
-                "sName": "fnRowGroupung"
+                "sName": "fnRowGrouping"
             });
 
             var aaSortingFixed = new Array();
