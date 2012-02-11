@@ -1,6 +1,6 @@
 /*
 * File:        jquery.dataTables.grouping.js
-* Version:     1.1.3.
+* Version:     1.1.4.
 * Author:      Jovan Popovic 
 * 
 * Copyright 2011 Jovan Popovic, all rights reserved.
@@ -284,12 +284,16 @@
                     var sGroup2 = null;
 
                     sGroupData = oSettings.aoData[oSettings.aiDisplay[iDisplayIndex]]._aData[properties.iGroupingColumnIndex];
+                    if (sGroupData == undefined)
+                        sGroupData = oSettings.aoData[oSettings.aiDisplay[iDisplayIndex]]._aData[oSettings.aoColumns[properties.iGroupingColumnIndex].mDataProp ]; 
                     var sGroup = sGroupData;
                     if (properties.sGroupBy != "year")
                         sGroup = fnGetGroup(sGroupData);
 
                     if (bUseSecondaryGrouping) {
                         sGroupData2 = oSettings.aoData[oSettings.aiDisplay[iDisplayIndex]]._aData[properties.iGroupingColumnIndex2];
+                        if (sGroupData2 == undefined)
+                            sGroupData2 = oSettings.aoData[oSettings.aiDisplay[iDisplayIndex]]._aData[oSettings.aoColumns[properties.iGroupingColumnIndex2].mDataProp]; 
                         if (properties.sGroupBy2 != "year")
                             sGroup2 = fnGetGroup(sGroupData2);
                     }
