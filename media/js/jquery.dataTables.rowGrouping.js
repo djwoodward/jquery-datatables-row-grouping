@@ -1,6 +1,6 @@
 /*
 * File:        jquery.dataTables.grouping.js
-* Version:     1.1.5.
+* Version:     1.1.6.
 * Author:      Jovan Popovic 
 * 
 * Copyright 2011 Jovan Popovic, all rights reserved.
@@ -300,7 +300,7 @@
                             sGroup2 = fnGetGroup(sGroupData2);
                     }
 
-                    nTrs[i].attr("data-group", _fnGetCleanedGroup(sGroup));
+                    $(nTrs[i]).attr("data-group", _fnGetCleanedGroup(sGroup));
                     if (sLastGroup == null || _fnGetCleanedGroup(sGroup) != _fnGetCleanedGroup(sLastGroup)) {
                         var sGroupCleaned = _fnGetCleanedGroup(sGroup);
 
