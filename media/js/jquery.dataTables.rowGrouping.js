@@ -292,15 +292,17 @@
                     if (properties.sGroupBy != "year")
                         sGroup = fnGetGroup(sGroupData);
 
+		    $(nTrs[i]).attr("data-group", _fnGetCleanedGroup(sGroup));
                     if (bUseSecondaryGrouping) {
                         sGroupData2 = oSettings.aoData[oSettings.aiDisplay[iDisplayIndex]]._aData[properties.iGroupingColumnIndex2];
                         if (sGroupData2 == undefined)
                             sGroupData2 = oSettings.aoData[oSettings.aiDisplay[iDisplayIndex]]._aData[oSettings.aoColumns[properties.iGroupingColumnIndex2].mDataProp]; 
                         if (properties.sGroupBy2 != "year")
                             sGroup2 = fnGetGroup(sGroupData2);
+			$(nTrs[i]).attr("data-group", _fnGetCleanedGroup(sGroup)+'_'+_fnGetCleanedGroup(sGroup2));
                     }
 
-                    $(nTrs[i]).attr("data-group", _fnGetCleanedGroup(sGroup));
+                    
                     if (sLastGroup == null || _fnGetCleanedGroup(sGroup) != _fnGetCleanedGroup(sLastGroup)) {
                         var sGroupCleaned = _fnGetCleanedGroup(sGroup);
 
