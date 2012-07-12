@@ -1,6 +1,6 @@
 /*
 * File:        jquery.dataTables.grouping.js
-* Version:     1.1.6.
+* Version:     1.2.0.
 * Author:      Jovan Popovic 
 * 
 * Copyright 2011 Jovan Popovic, all rights reserved.
@@ -47,6 +47,12 @@
 
         }
 
+        function _fnOnGroupCreated(nGroup, sGroup, iLevel) {
+            ///<summary>
+            ///Function called when a new grouping row is created(it should be overriden in properties)
+            ///</summary>
+        }
+
         function _getMonthName(iMonth) {
             var asMonths = ["January", "February", "March", "April", "May", "June", "Jully", "August", "September", "October", "November", "December"];
             return asMonths[iMonth - 1];
@@ -81,15 +87,73 @@
             sGroupLabelPrefix2: "",
             bExpandableGrouping2: false,
 
-            fnOnGrouped: _fnOnGrouped
+            fnOnGrouped: _fnOnGrouped,
 
+            fnOnGroupCreated: _fnOnGroupCreated,
 
+            oHideEffect: null,// { method: "hide", duration: "fast", easing: "linear" },
+            oShowEffect: null//{ method: "show", duration: "slow", easing: "linear" }
         };
-
-
         return this.each(function (index, elem) {
 
             var oTable = $(elem).dataTable();
+
+            var aoGroups = new Array();
+            $(this).dataTableExt.aoGroups = aoGroups;
+
+            function fnCreateGroupRow(sGroupCleaned, sGroup, iColspan) {
+                var nGroup = document.createElement('tr');
+                var nCell = document.createElement('td');
+
+                nGroup.id = "group-id-" + oTable.attr("id") + "-" + sGroupCleaned;
+
+                if (properties.bSetGroupingClassOnTR) {
+                    nGroup.className = properties.sGroupingClass + " " + sGroupCleaned;
+                } else {
+                    nCell.className = properties.sGroupingClass + " " + sGroupCleaned;
+                }
+
+                nCell.colSpan = iColspan;
+                nCell.innerHTML = properties.sGroupLabelPrefix + (sGroup == "" ? properties.sEmptyGroupLabel : sGroup);
+                if (properties.bExpandableGrouping) {
+
+
+                    if (_fnIsGroupExpanded(sGroupCleaned)) {
+                        nCell.className += " expanded-group";
+                    } else {
+                        nCell.className += " collapsed-group";
+                    }
+                    nCell.className += " group-item-expander";
+                    //nCell.rel = sGroupCleaned;
+                    $(nCell).attr('rel', sGroupCleaned); //Fix provided by mssskhalsa (Issue 5)
+                    $(nCell).click(_fnOnGroupClick);
+                }
+                nGroup.appendChild(nCell);
+                aoGroups[sGroupCleaned] = { id: nGroup.id, key: sGroupCleaned, text: sGroup, level: 0, groupItemClass: ".group-item-" + sGroup, aoSubgroups: new Array() };
+                properties.fnOnGroupCreated(nGroup, sGroupCleaned, 1);
+                return nGroup;
+            }
+
+            function _fnCreateGroup2Row(sGroup2, oGroup, iColspan) {
+                var nGroup2 = document.createElement('tr');
+                nGroup2.id = oGroup.id + "-" + sGroup2;
+                var nCell2 = document.createElement('td');
+
+                if (properties.bSetGroupingClassOnTR) {
+                    nGroup2.className = properties.sGroupingClass2 + " " + sGroup2.toLowerCase().replace(" ", "-");
+                } else {
+                    nCell2.className = properties.sGroupingClass2 + " " + sGroup2.toLowerCase().replace(" ", "-");
+                }
+
+                nCell2.colSpan = iColspan;
+                nCell2.innerHTML = properties.sGroupLabelPrefix2 + (sGroup2 == "" ? properties.sEmptyGroupLabel : sGroup2);
+
+                nGroup2.appendChild(nCell2);
+                oGroup.aoSubgroups[sGroup2] = { id: nGroup2.id, key: sGroup2, text: sGroup2, level: oGroup.level + 1, groupItemClass: ".group-item-" + sGroup2, aoSubgroups: new Array() };
+                properties.fnOnGroupCreated(nGroup2, sGroup2, 2);
+                return nGroup2;
+            }
+
             function _fnIsGroupExpanded(sGroup) {
                 return ($.inArray(sGroup, asExpandedGroups) != -1);
             }
@@ -117,9 +181,31 @@
             }
 
             function _fnGetCleanedGroup(sGroup) {
-                //return sGroup.toLowerCase().replace(" ", "-");
-                //return sGroup.toLowerCase().replace(/\s/g, "-"); //Fix provided by danilo.t (Issue 3)
+                if (sGroup === "") return "-";
                 return sGroup.toLowerCase().replace(/\W+/g, "-"); //Fix provided by bmathews (Issue 7)
+            }
+
+            function fnExpandGroup(sGroup) {
+                ///<summary>Expand group if expanadable grouping is used</summary>
+		if(properties.oHideEffect != null)
+                	$(".group-item-" + sGroup, oTable)
+					[properties.oShowEffect.method](properties.oShowEffect.duration,
+									properties.oShowEffect.easing,
+									function () { });
+		else
+			$(".group-item-" + sGroup, oTable).show();
+            }
+
+            function fnCollapseGroup(sGroup) {
+                ///<summary>Collapse group if expanadable grouping is used</summary>
+		if(properties.oHideEffect != null)
+                	$(".group-item-" + sGroup, oTable)
+					[properties.oHideEffect.method](properties.oHideEffect.duration,
+									properties.oHideEffect.easing,
+									function () { });
+		else
+			$(".group-item-" + sGroup, oTable).hide();
+			
             }
 
             var _fnOnGroupClick = function (e) {
@@ -136,9 +222,10 @@
                         var sCurrentGroup = asExpandedGroups[0];
                         asExpandedGroups = new Array();
                         asExpandedGroups.push(sGroup);
-
-                        $(".group-item-" + sCurrentGroup, oTable).hide();
-                        $(".group-item-" + sGroup, oTable).show();
+                        fnCollapseGroup(sCurrentGroup);
+                        //$(".group-item-" + sCurrentGroup, oTable).hide();
+                        fnExpandGroup(sGroup);
+                        //$(".group-item-" + sGroup, oTable).show();
 
                         var oTrExpandedGroup = $(".expanded-group");
                         oTrExpandedGroup.removeClass("expanded-group");
@@ -159,12 +246,14 @@
                         asExpandedGroups.splice(index, 1);
                         $(this).removeClass("expanded-group");
                         $(this).addClass("collapsed-group");
-                        $(".group-item-" + sGroup, oTable).hide();
+                        fnCollapseGroup(sGroup);
+                        //$(".group-item-" + sGroup, oTable).hide();
                     } else {
                         asExpandedGroups.push(sGroup);
                         $(this).addClass("expanded-group");
                         $(this).removeClass("collapsed-group");
-                        $(".group-item-" + sGroup, oTable).show();
+                        fnExpandGroup(sGroup);
+                        //$(".group-item-" + sGroup, oTable).show();
                     }
                 }
                 e.preventDefault();
@@ -254,7 +343,6 @@
 
 
 
-
             var _fnDrawCallBackWithGrouping = function (oSettings) {
 
                 if (oTable.fnSettings().oFeatures.bServerSide)
@@ -266,152 +354,102 @@
 
                 //-----Start grouping
 
-                if (oSettings.aiDisplay.length == 0) {
+                if (oSettings.aiDisplayMaster.length == 0) { //aiDisplay
                     return;
                 }
 
                 var nTrs = $('tbody tr', oTable);
-                var iColspan = nTrs[0].getElementsByTagName('td').length;
+                var iColspan = 0; //nTrs[0].getElementsByTagName('td').length;
+                for (var iColIndex = 0; iColIndex < oSettings.aoColumns.length; iColIndex++) {
+                    if (oSettings.aoColumns[iColIndex].bVisible)
+                        iColspan += 1;
+                }
                 var sLastGroup = null;
                 var sLastGroup2 = null;
-                for (var i = 0; i < nTrs.length; i++) {
+                if (oSettings.aiDisplay.length > 0) {
+                    for (var i = 0; i < nTrs.length; i++) {
 
-                    
-                    var iDisplayIndex = oSettings._iDisplayStart + i;
-                    if (oTable.fnSettings().oFeatures.bServerSide)
-                        iDisplayIndex = i;
-                    var sGroupData = "";
-                    var sGroup = null;
-                    var sGroupData2 = "";
-                    var sGroup2 = null;
 
-                    sGroupData = oSettings.aoData[oSettings.aiDisplay[iDisplayIndex]]._aData[properties.iGroupingColumnIndex];
-                    if (sGroupData == undefined)
-                        sGroupData = oSettings.aoData[oSettings.aiDisplay[iDisplayIndex]]._aData[oSettings.aoColumns[properties.iGroupingColumnIndex].mDataProp ]; 
-                    var sGroup = sGroupData;
-                    if (properties.sGroupBy != "year")
-                        sGroup = fnGetGroup(sGroupData);
+                        var iDisplayIndex = oSettings._iDisplayStart + i;
+                        if (oTable.fnSettings().oFeatures.bServerSide)
+                            iDisplayIndex = i;
+                        var sGroupData = "";
+                        var sGroup = null;
+                        var sGroupData2 = "";
+                        var sGroup2 = null;
 
-		    $(nTrs[i]).attr("data-group", _fnGetCleanedGroup(sGroup));
-                    if (bUseSecondaryGrouping) {
-                        sGroupData2 = oSettings.aoData[oSettings.aiDisplay[iDisplayIndex]]._aData[properties.iGroupingColumnIndex2];
-                        if (sGroupData2 == undefined)
-                            sGroupData2 = oSettings.aoData[oSettings.aiDisplay[iDisplayIndex]]._aData[oSettings.aoColumns[properties.iGroupingColumnIndex2].mDataProp]; 
-                        if (properties.sGroupBy2 != "year")
-                            sGroup2 = fnGetGroup(sGroupData2);
-			$(nTrs[i]).attr("data-group", _fnGetCleanedGroup(sGroup)+'_'+_fnGetCleanedGroup(sGroup2));
-                    }
+                        sGroupData = oSettings.aoData[oSettings.aiDisplay[iDisplayIndex]]._aData[properties.iGroupingColumnIndex];
+                        if (sGroupData == undefined)
+                            sGroupData = oSettings.aoData[oSettings.aiDisplay[iDisplayIndex]]._aData[oSettings.aoColumns[properties.iGroupingColumnIndex].mDataProp];
+                        var sGroup = sGroupData;
+                        if (properties.sGroupBy != "year")
+                            sGroup = fnGetGroup(sGroupData);
 
-                    
-                    if (sLastGroup == null || _fnGetCleanedGroup(sGroup) != _fnGetCleanedGroup(sLastGroup)) {
-                        var sGroupCleaned = _fnGetCleanedGroup(sGroup);
+                        $(nTrs[i]).attr("data-group", _fnGetCleanedGroup(sGroup));
+                        if (bUseSecondaryGrouping) {
+                            sGroupData2 = oSettings.aoData[oSettings.aiDisplay[iDisplayIndex]]._aData[properties.iGroupingColumnIndex2];
+                            if (sGroupData2 == undefined)
+                                sGroupData2 = oSettings.aoData[oSettings.aiDisplay[iDisplayIndex]]._aData[oSettings.aoColumns[properties.iGroupingColumnIndex2].mDataProp];
+                            if (properties.sGroupBy2 != "year")
+                                sGroup2 = fnGetGroup(sGroupData2);
+                            $(nTrs[i]).attr("data-group", _fnGetCleanedGroup(sGroup) + '_' + _fnGetCleanedGroup(sGroup2));
+                        }
 
-                        if (properties.bExpandableGrouping && bInitialGrouping) {
-                            if (properties.bExpandSingleGroup) {
-                                if (asExpandedGroups.length == 0)
+
+                        if (sLastGroup == null || _fnGetCleanedGroup(sGroup) != _fnGetCleanedGroup(sLastGroup)) { // new group encountered (or first of group)
+                            var sGroupCleaned = _fnGetCleanedGroup(sGroup);
+
+                            if (properties.bExpandableGrouping && bInitialGrouping) {
+                                if (properties.bExpandSingleGroup) {
+                                    if (asExpandedGroups.length == 0)
+                                        asExpandedGroups.push(sGroupCleaned);
+                                } else {
                                     asExpandedGroups.push(sGroupCleaned);
-                            } else {
-                                asExpandedGroups.push(sGroupCleaned);
+                                }
                             }
-                        }
+
+                            var nGroup = fnCreateGroupRow(sGroupCleaned, sGroup, iColspan);
+
+                            nTrs[i].parentNode.insertBefore(nGroup, nTrs[i]);
+                            sLastGroup = sGroup;
+                            sLastGroup2 = null; //to reset second level grouping
 
 
-                        var nGroup = document.createElement('tr');
-                        var nCell = document.createElement('td');
 
-                        nGroup.id = "group-id-" + oTable.attr("id") + "-" + sGroupCleaned;
 
-                        if (properties.bSetGroupingClassOnTR) {
-                            nGroup.className = properties.sGroupingClass + " " + sGroupCleaned;
-                        } else {
-                            nCell.className = properties.sGroupingClass + " " + sGroupCleaned;
-                        }
 
-                        nCell.colSpan = iColspan;
-                        nCell.innerHTML = properties.sGroupLabelPrefix + (sGroup == "" ? properties.sEmptyGroupLabel : sGroup);
+                        } // end if (sLastGroup == null || sGroup != sLastGroup)
+
                         if (properties.bExpandableGrouping) {
-
-
-                            if (_fnIsGroupExpanded(sGroupCleaned)) {
-                                nCell.className += " expanded-group";
-                            } else {
-                                nCell.className += " collapsed-group";
+                            $(nTrs[i]).addClass("group-item-" + sGroupCleaned);
+                            if (/*properties.bExpandSingleGroup &&*/!_fnIsGroupExpanded(sGroupCleaned)) {
+                                $(nTrs[i]).hide();
                             }
-                            nCell.className += " group-item-expander";
-                            //nCell.rel = sGroupCleaned;
-                            $(nCell).attr('rel', sGroupCleaned); //Fix provided by mssskhalsa (Issue 5)
-
-                            ///*************
-
-
-                            $(nCell).click(_fnOnGroupClick);
-                    
-
-
-
-
-
-
-                            ///***********
-
-
-
-
-
-
                         }
-                        nGroup.appendChild(nCell);
-                        nTrs[i].parentNode.insertBefore(nGroup, nTrs[i]);
-                        sLastGroup = sGroup;
-                        sLastGroup2 = null; //to reset second level grouping
 
 
+                        if (bUseSecondaryGrouping) {
 
-
-
-                    } // end if (sLastGroup == null || sGroup != sLastGroup)
-
-                    if (properties.bExpandableGrouping) {
-                        $(nTrs[i]).addClass("group-item-" + sGroupCleaned);
-                        if (/*properties.bExpandSingleGroup &&*/!_fnIsGroupExpanded(sGroupCleaned)) {
-                            $(nTrs[i]).hide();
-                        }
-                    }
-
-
-                    if (bUseSecondaryGrouping) {
-
-                        if (sLastGroup2 == null || _fnGetCleanedGroup(sGroup2) != _fnGetCleanedGroup(sLastGroup2)) {
-                            var nGroup2 = document.createElement('tr');
-                            var nCell2 = document.createElement('td');
-
-                            if (properties.bSetGroupingClassOnTR) {
-                                nGroup2.className = properties.sGroupingClass2 + " " + sGroup2.toLowerCase().replace(" ", "-");
-                            } else {
-                                nCell2.className = properties.sGroupingClass2 + " " + sGroup2.toLowerCase().replace(" ", "-");
+                            if (sLastGroup2 == null || _fnGetCleanedGroup(sGroup2) != _fnGetCleanedGroup(sLastGroup2)) {
+                                nTrs[i].parentNode.insertBefore(_fnCreateGroup2Row(sGroup2, aoGroups[sGroupCleaned], iColspan), nTrs[i]);
+                                sLastGroup2 = sGroup2;
                             }
 
-                            nCell2.colSpan = iColspan;
-                            nCell2.innerHTML = properties.sGroupLabelPrefix2 + (sGroup2 == "" ? properties.sEmptyGroupLabel : sGroup2);
 
-                            nGroup2.appendChild(nCell2);
-                            nTrs[i].parentNode.insertBefore(nGroup2, nTrs[i]);
-                            sLastGroup2 = sGroup2;
-                        }
-
-
-                    } //end if (bUseSecondaryGrouping)
+                        } //end if (bUseSecondaryGrouping)
 
 
 
-                } // end for (var i = 0; i < nTrs.length; i++)
+                    } // end for (var i = 0; i < nTrs.length; i++)
+                }; // if (oSettings.aiDisplay.length > 0)
+
 
 
                 //-----End grouping
                 properties.fnOnGrouped();
 
                 bInitialGrouping = false;
-            };
+            }; // end of _fnDrawCallBackWithGrouping = function (oSettings)
 
 
 
@@ -435,7 +473,7 @@
             aaSortingFixed.push([properties.iGroupingOrderByColumnIndex, properties.sGroupingColumnSortDirection]);
             if (properties.iGroupingColumnIndex2 != -1) {
                 aaSortingFixed.push([properties.iGroupingOrderByColumnIndex2, properties.sGroupingColumnSortDirection2]);
-            }
+            } // end of if (properties.iGroupingColumnIndex2 != -1)
 
             oTable.fnSettings().aaSortingFixed = aaSortingFixed;
             //Old way
@@ -482,19 +520,9 @@
                 default:
                     break;
 
-            }
-            if (properties.sGroupBy == "name" || properties.sGroupBy == "letter") {
-
-            } else {
-                //oTable.fnSettings().aaSortingFixed = [[properties.iGroupingOrderByColumnIndex, properties.sGroupingColumnSortDirection]];
-
-            }
+            } // end of switch (properties.sGroupBy)
 
             oTable.fnDraw();
-
-
-
-
 
         });
     };

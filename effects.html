@@ -34,7 +34,12 @@
 
 		<script type="text/javascript" charset="utf-8">
 			$(document).ready( function () {
-				$('#example').dataTable({ "bLengthChange": false, "bPaginate": false}).rowGrouping({bExpandableGrouping: true});
+				$('#example').dataTable({ "bLengthChange": false, "bPaginate": false})
+						.rowGrouping({	bExpandableGrouping: true,
+
+            							oHideEffect: { method: "hide", duration: "slow", easing: "linear" },
+            							oShowEffect: { method: "show", duration: "slow", easing: "linear" }
+							});
 			} );
 		</script>
 <script type="text/javascript">
@@ -62,14 +67,9 @@
 			<a href="http://code.google.com/p/jquery-datatables-column-filter/wiki/ColumnFilter">Wiki</a> 
 			<h1 class="full_width big">
 
-				JQuery DataTable Row Grouping - Collapsible/Expandable Grouping
+				JQuery DataTable Row Grouping - Using Effects
 			</h1>
 			
-			<h2>Preamble</h2>
-			<p>
-				DataTables Row Grouping add-in can be configured to automatically collapse/expand groups. If you set bExpandableGrouping to value true
-				add-in will attach click handler to the groups that hides/shows rows within the group. 
-			</p>
 
 			
 	
@@ -577,20 +577,7 @@
 			<div class="spacer"></div>
 
 			
-			
 
-			
-			<h2>Initialization code</h2>
-			<p>To initialize add-in you need to set the bExpandable flag. In this mode you MUST disable pagination and changing number of 
-			the records that should be shown in the DataTables plugin</p>
-			<pre>$(document).ready( function () {
-			$(document).ready( function () {
-				$('#example').dataTable({ "bLengthChange": false, "bPaginate": false})
-						.rowGrouping({bExpandableGrouping: true});
-			} );
-}
-	</pre>
-	
 
 
 			<h2>Other examples</h2>
@@ -610,8 +597,8 @@
 			
 			<div id="footer" style="text-align:center;">
 				<span style="font-size:10px;">
-					DataTables Row Grouping Add-on &copy; Jovan Popovic 2011.<br>
-					DataTables designed and created by <a href="http://www.sprymedia.co.uk">Allan Jardine</a> &copy; 2007-2011<br>
+					DataTables Row Grouping Add-on &copy; Jovan Popovic 2012.<br>
+					DataTables designed and created by <a href="http://www.sprymedia.co.uk">Allan Jardine</a> &copy; 2007-2012<br>
 				</span>
 			</div>
 		</div>
