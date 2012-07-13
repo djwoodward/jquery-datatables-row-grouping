@@ -1,6 +1,6 @@
 /*
 * File:        jquery.dataTables.grouping.js
-* Version:     1.2.0.
+* Version:     1.2.1.
 * Author:      Jovan Popovic 
 * 
 * Copyright 2011 Jovan Popovic, all rights reserved.
@@ -68,6 +68,7 @@
             bHideGroupingOrderByColumn: true,
             sGroupBy: "name",
             sGroupLabelPrefix: "",
+            fnGroupLabelFormat: function(label){ return label; },
             bExpandableGrouping: false,
             bExpandSingleGroup: false,
             iExpandGroupOffset: 100,
@@ -85,6 +86,7 @@
             bHideGroupingOrderByColumn2: true,
             sGroupBy2: "name",
             sGroupLabelPrefix2: "",
+            fnGroupLabelFormat2: function(label){ return label; },
             bExpandableGrouping2: false,
 
             fnOnGrouped: _fnOnGrouped,
@@ -114,7 +116,7 @@
                 }
 
                 nCell.colSpan = iColspan;
-                nCell.innerHTML = properties.sGroupLabelPrefix + (sGroup == "" ? properties.sEmptyGroupLabel : sGroup);
+                nCell.innerHTML = properties.sGroupLabelPrefix + properties.fnGroupLabelFormat(sGroup == "" ? properties.sEmptyGroupLabel : sGroup);
                 if (properties.bExpandableGrouping) {
 
 
@@ -146,7 +148,7 @@
                 }
 
                 nCell2.colSpan = iColspan;
-                nCell2.innerHTML = properties.sGroupLabelPrefix2 + (sGroup2 == "" ? properties.sEmptyGroupLabel : sGroup2);
+                nCell2.innerHTML = properties.sGroupLabelPrefix2 + properties.fnGroupLabelFormat2(sGroup2 == "" ? properties.sEmptyGroupLabel : sGroup2);
 
                 nGroup2.appendChild(nCell2);
                 oGroup.aoSubgroups[sGroup2] = { id: nGroup2.id, key: sGroup2, text: sGroup2, level: oGroup.level + 1, groupItemClass: ".group-item-" + sGroup2, aoSubgroups: new Array() };
@@ -181,8 +183,10 @@
             }
 
             function _fnGetCleanedGroup(sGroup) {
+
                 if (sGroup === "") return "-";
-                return sGroup.toLowerCase().replace(/\W+/g, "-"); //Fix provided by bmathews (Issue 7)
+                return sGroup.toLowerCase().replace("[^(\W\u0080-\uFFFF]", "-"); //fix for univcode characters (Issue 23)
+                //return sGroup.toLowerCase().replace(/\W+/g, "-"); //Fix provided by bmathews (Issue 7)
             }
 
             function fnExpandGroup(sGroup) {
@@ -223,9 +227,7 @@
                         asExpandedGroups = new Array();
                         asExpandedGroups.push(sGroup);
                         fnCollapseGroup(sCurrentGroup);
-                        //$(".group-item-" + sCurrentGroup, oTable).hide();
                         fnExpandGroup(sGroup);
-                        //$(".group-item-" + sGroup, oTable).show();
 
                         var oTrExpandedGroup = $(".expanded-group");
                         oTrExpandedGroup.removeClass("expanded-group");
@@ -247,13 +249,11 @@
                         $(this).removeClass("expanded-group");
                         $(this).addClass("collapsed-group");
                         fnCollapseGroup(sGroup);
-                        //$(".group-item-" + sGroup, oTable).hide();
                     } else {
                         asExpandedGroups.push(sGroup);
                         $(this).addClass("expanded-group");
                         $(this).removeClass("collapsed-group");
                         fnExpandGroup(sGroup);
-                        //$(".group-item-" + sGroup, oTable).show();
                     }
                 }
                 e.preventDefault();
