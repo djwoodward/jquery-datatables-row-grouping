@@ -185,7 +185,7 @@
             function _fnGetCleanedGroup(sGroup) {
 
                 if (sGroup === "") return "-";
-                return sGroup.toLowerCase().replace("[^(\W\u0080-\uFFFF]", "-"); //fix for univcode characters (Issue 23)
+                return sGroup.toLowerCase().replace(/[^a-zA-Z0-9\u0080-\uFFFF]+/g, "-"); //fix for univcode characters (Issue 23)
                 //return sGroup.toLowerCase().replace(/\W+/g, "-"); //Fix provided by bmathews (Issue 7)
             }
 
