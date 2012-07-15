@@ -93,9 +93,14 @@
 }
 
 .expanded-group {
-    background: url("../images/sort_asc.png") no-repeat scroll right center transparent;
+    background: url("../images/minus.jpg") no-repeat scroll right center transparent;
 }
 
 .collapsed-group {
-    background: url("../images/sort_desc.png") no-repeat scroll right center transparent;
+    background: url("../images/plus.jpg") no-repeat scroll right center transparent;
 }
+
+.subgroup{ 
+    background-color: #D4DFD8;
+    border-bottom: medium solid;
+ }

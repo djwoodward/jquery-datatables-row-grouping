@@ -22,12 +22,16 @@
 
 		<script type="text/javascript" charset="utf-8">
 			$(document).ready( function () {
-				$('#example').dataTable().rowGrouping({	iGroupingColumnIndex2: 4,
+				$('#example').dataTable({ "bLengthChange": false, "bPaginate": false})
+							.rowGrouping({	iGroupingColumnIndex2: 4,
 									sGroupLabelPrefix: "Rendering Engine - ",
-									fnGroupLabelFormat: function(label) { return "<b>"+ label + "</b> (primary group)"; } ,
+									fnGroupLabelFormat: function(label) { return " "+ label + " (primary group)"; } ,
+									bExpandableGrouping: true,
 									sGroupLabelPrefix2: "CSS Class - ",
-									fnGroupLabelFormat2: function(label) { return " "+label + "<sub>(secondary group)</sub>"; } ,
-									bHideGroupingColumn2: false});
+									fnGroupLabelFormat2: function(label) { return " "+label + "(secondary group)"; } ,
+									bHideGroupingColumn2: false,
+									bExpandableGrouping2: true
+								});
 				
 			} );
 		</script>
