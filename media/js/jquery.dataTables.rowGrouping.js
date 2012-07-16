@@ -1,6 +1,6 @@
 /*
 * File:        jquery.dataTables.grouping.js
-* Version:     1.2.2.
+* Version:     1.2.3.
 * Author:      Jovan Popovic 
 * 
 * Copyright 2011 Jovan Popovic, all rights reserved.
@@ -203,7 +203,10 @@
                         return ($.inArray(sGroup, asExpandedGroups) == -1);
             }
             function _fnGetYear(x) {
-                return x.substr(iYearIndex, iYearLength);
+		if(x.length< (iYearIndex+iYearLength) )
+			return x;
+		else
+	                return x.substr(iYearIndex, iYearLength);
             }
             function _fnGetGroupByName(x) {
                 return x;
@@ -588,9 +591,17 @@
                     oTable.fnSettings().aoColumns[properties.iGroupingOrderByColumnIndex].sSortDataType = "rg-date";
                     $.fn.dataTableExt.afnSortData['rg-date'] = function (oSettings, iColumn) {
                         var aData = [];
+			var nTrs = oSettings.oApi._fnGetTrNodes(oSettings);
+			for(i = 0; i< nTrs.length; i++)
+			{
+				aData.push(_fnGetYear( oTable.fnGetData( nTrs[i], iColumn) ));
+			}
+
+/*
                         $('td:eq(' + iColumn + ')', oSettings.oApi._fnGetTrNodes(oSettings)).each(function () {
                             aData.push(_fnGetYear(this.innerHTML));
                         });
+*/
                         return aData;
                     }
                     break;
