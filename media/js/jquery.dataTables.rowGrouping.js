@@ -1,9 +1,9 @@
 /*
 * File:        jquery.dataTables.grouping.js
-* Version:     1.2.3.
+* Version:     1.2.4.
 * Author:      Jovan Popovic 
 * 
-* Copyright 2011 Jovan Popovic, all rights reserved.
+* Copyright 2012 Jovan Popovic, all rights reserved.
 *
 * This source file is free software, under either the GPL v2 license or a
 * BSD style license, as supplied with this software.
@@ -94,7 +94,9 @@
             fnOnGroupCreated: _fnOnGroupCreated,
 
             oHideEffect: null, // { method: "hide", duration: "fast", easing: "linear" },
-            oShowEffect: null//{ method: "show", duration: "slow", easing: "linear" }
+            oShowEffect: null,//{ method: "show", duration: "slow", easing: "linear" }
+			
+			bUseFilteringForGrouping: false // This is still work in progress option
         };
         return this.each(function (index, elem) {
 
@@ -201,12 +203,13 @@
                         true;
                     else
                         return ($.inArray(sGroup, asExpandedGroups) == -1);
-            }
+            }			
+			
             function _fnGetYear(x) {
-		if(x.length< (iYearIndex+iYearLength) )
-			return x;
-		else
-	                return x.substr(iYearIndex, iYearLength);
+				if(x.length< (iYearIndex+iYearLength) )
+					return x;
+				else
+					return x.substr(iYearIndex, iYearLength);
             }
             function _fnGetGroupByName(x) {
                 return x;
@@ -234,9 +237,34 @@
                 return sGroup.toLowerCase().replace(/[^a-zA-Z0-9\u0080-\uFFFF]+/g, "-"); //fix for unicode characters (Issue 23)
                 //return sGroup.toLowerCase().replace(/\W+/g, "-"); //Fix provided by bmathews (Issue 7)
             }
+			
+			function _rowGroupingRowFilter(oSettings, aData, iDataIndex) {
+			    ///<summary>Used to expand/collapse groups with DataTables filtering</summary>
+                if (oSettings.nTable.id !== oTable[0].id) return true;
+                var sColData = aData[properties.iGroupingColumnIndex];
+                if (typeof sColData === "undefined")
+                    sColData = aData[oSettings.aoColumns[properties.iGroupingColumnIndex].mDataProp];
+                if (_fnIsGroupCollapsed(_fnGetCleanedGroup(sColData))) {
+                    if (oTable.fnIsOpen(oTable.fnGetNodes(iDataIndex)))
+					{
+						if (properties.fnOnRowClosed != null) {
+                            properties.fnOnRowClosed(this); //    $(this.cells[0].children[0]).attr('src', '../../Images/details.png');
+                        }
+                        oTable.fnClose(oTable.fnGetNodes(iDataIndex));
+                    }
+                    return false;
+                };
+				return true;
+            } //end of function _rowGroupingRowFilter
+
 
             function fnExpandGroup(sGroup) {
                 ///<summary>Expand group if expanadable grouping is used</summary>
+				
+			    aoGroups[sGroup].state = "expanded";	
+				if(properties.bUseFilteringForGrouping)
+					return;//Because rows are expanded with _rowGroupingRowFilter function
+				
                 if (properties.oHideEffect != null)
                     $(".group-item-" + sGroup, oTable)
 					[properties.oShowEffect.method](properties.oShowEffect.duration,
@@ -245,12 +273,17 @@
                 else
                     $(".group-item-" + sGroup, oTable).show();
 
-                aoGroups[sGroup].state = "expanded";
-            }
+
+            } //end of function fnExpandGroup
 
             function fnCollapseGroup(sGroup) {
                 ///<summary>Collapse group if expanadable grouping is used</summary>
 
+				aoGroups[sGroup].state = "collapsed";
+				
+				if(properties.bUseFilteringForGrouping)
+					return;//Because rows are expanded with _rowGroupingRowFilter function
+				
                 $('.group-item-' + sGroup).each(function () {
                     //Issue 24 - Patch provided by Bob Graham
                     if (oTable.fnIsOpen(this)) {
@@ -269,8 +302,7 @@
                 else
                     $(".group-item-" + sGroup, oTable).hide();
 
-                aoGroups[sGroup].state = "collapsed";
-            }
+            } //end of function fnCollapseGroup
 
             var _fnOnGroupClick = function (e) {
                 ///<summary>
@@ -320,7 +352,7 @@
 
                         fnCollapseGroup(sGroup);
                     } else {
-                        if (asExpandedGroups.indexOf(sGroup) == -1)
+                        if (jQuery.inArray(sGroup, asExpandedGroups)==-1)
                             asExpandedGroups.push(sGroup);
 
                         var dataGroup = $(this).attr("data-group");
@@ -538,6 +570,8 @@
             }; // end of _fnDrawCallBackWithGrouping = function (oSettings)
 
 
+			if(properties.bUseFilteringForGrouping)
+				$.fn.dataTableExt.afnFiltering.push(_rowGroupingRowFilter);
 
 
             oTable.fnSetColumnVis(properties.iGroupingColumnIndex, !properties.bHideGroupingColumn);
@@ -591,11 +625,11 @@
                     oTable.fnSettings().aoColumns[properties.iGroupingOrderByColumnIndex].sSortDataType = "rg-date";
                     $.fn.dataTableExt.afnSortData['rg-date'] = function (oSettings, iColumn) {
                         var aData = [];
-			var nTrs = oSettings.oApi._fnGetTrNodes(oSettings);
-			for(i = 0; i< nTrs.length; i++)
-			{
-				aData.push(_fnGetYear( oTable.fnGetData( nTrs[i], iColumn) ));
-			}
+						var nTrs = oSettings.oApi._fnGetTrNodes(oSettings);
+						for(i = 0; i< nTrs.length; i++)
+						{
+							aData.push(_fnGetYear( oTable.fnGetData( nTrs[i], iColumn) ));
+						}
 
 /*
                         $('td:eq(' + iColumn + ')', oSettings.oApi._fnGetTrNodes(oSettings)).each(function () {
