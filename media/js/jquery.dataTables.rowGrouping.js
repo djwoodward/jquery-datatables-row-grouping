@@ -1,6 +1,6 @@
 /*
 * File:        jquery.dataTables.grouping.js
-* Version:     1.2.4.
+* Version:     1.2.5.
 * Author:      Jovan Popovic 
 * 
 * Copyright 2012 Jovan Popovic, all rights reserved.
@@ -186,8 +186,6 @@
 
                 nGroup2.appendChild(nCell2);
 
-
-
                 oParentGroup.aoSubgroups[oGroup.dataGroup] = oGroup;
                 aoGroups[oGroup.dataGroup] = oGroup;
                 oGroup.nGroup = nGroup2;
@@ -202,7 +200,10 @@
                     if (sGroup.indexOf("_") > -1)
                         true;
                     else
-                        return ($.inArray(sGroup, asExpandedGroups) == -1);
+						if(bInitialGrouping && (asExpandedGroups==null || asExpandedGroups.length == 0))
+							return false;// initially if asExpandedGroups is empty - no one is collapsed
+						else
+							return ($.inArray(sGroup, asExpandedGroups) == -1); //the last chance check asExpandedGroups
             }			
 			
             function _fnGetYear(x) {
@@ -262,8 +263,19 @@
                 ///<summary>Expand group if expanadable grouping is used</summary>
 				
 			    aoGroups[sGroup].state = "expanded";	
+				
+				$("td[data-group^='" + sGroup + "']").removeClass("collapsed-group");
+                $("td[data-group^='" + sGroup + "']").addClass("expanded-group");
+						
+						
 				if(properties.bUseFilteringForGrouping)
+				{
+					oTable.fnDraw();
 					return;//Because rows are expanded with _rowGroupingRowFilter function
+				}
+				
+				if (jQuery.inArray(sGroup, asExpandedGroups)==-1)
+                    asExpandedGroups.push(sGroup);
 				
                 if (properties.oHideEffect != null)
                     $(".group-item-" + sGroup, oTable)
@@ -280,9 +292,16 @@
                 ///<summary>Collapse group if expanadable grouping is used</summary>
 
 				aoGroups[sGroup].state = "collapsed";
+				$("td[data-group^='" + sGroup + "']").removeClass("expanded-group");
+                $("td[data-group^='" + sGroup + "']").addClass("collapsed-group");
 				
 				if(properties.bUseFilteringForGrouping)
+				{
+					oTable.fnDraw();
 					return;//Because rows are expanded with _rowGroupingRowFilter function
+				}
+				//var index = $.inArray(sGroup, asExpandedGroups);
+                //asExpandedGroups.splice(index, 1);
 				
                 $('.group-item-' + sGroup).each(function () {
                     //Issue 24 - Patch provided by Bob Graham
@@ -304,7 +323,7 @@
 
             } //end of function fnCollapseGroup
 
-            var _fnOnGroupClick = function (e) {
+            function _fnOnGroupClick(e) {
                 ///<summary>
                 ///Function that is called when user click on the group cell in order to
                 ///expand of collapse group
@@ -317,17 +336,10 @@
                 var bIsExpanded = !_fnIsGroupCollapsed(sGroup);
                 if (properties.bExpandSingleGroup) {
                     if (!bIsExpanded) {
-                        var sCurrentGroup = asExpandedGroups[0];
-                        asExpandedGroups = new Array();
-                        asExpandedGroups.push(sGroup);
+                        var sCurrentGroup = $("td.expanded-group").attr("data-group");
                         fnCollapseGroup(sCurrentGroup);
                         fnExpandGroup(sGroup);
 
-                        var oTrExpandedGroup = $(".expanded-group");
-                        oTrExpandedGroup.removeClass("expanded-group");
-                        oTrExpandedGroup.addClass("collapsed-group");
-                        $(this).addClass("expanded-group");
-                        $(this).removeClass("collapsed-group");
                         if (properties.iExpandGroupOffset != -1) {
                             var position = $("#group-id-" + oTable.attr("id") + "-" + sGroup).offset().top - properties.iExpandGroupOffset;
                             window.scroll(0, position);
@@ -338,121 +350,17 @@
                     }
                 } else {
                     if (bIsExpanded) {
-                        //Collapse group
-                        var index = $.inArray(sGroup, asExpandedGroups);
-                        asExpandedGroups.splice(index, 1);
-
-                        //Expand subgroups
-                        var dataGroup = $(this).attr("data-group");
-                        $("td[data-group^='" + dataGroup + "']").removeClass("expanded-group");
-                        $("td[data-group^='" + dataGroup + "']").addClass("collapsed-group");
-
-                        //$(this).removeClass("expanded-group");
-                        //$(this).addClass("collapsed-group");
-
                         fnCollapseGroup(sGroup);
                     } else {
-                        if (jQuery.inArray(sGroup, asExpandedGroups)==-1)
-                            asExpandedGroups.push(sGroup);
-
-                        var dataGroup = $(this).attr("data-group");
-                        $("td[data-group^='" + dataGroup + "']").removeClass("collapsed-group");
-                        $("td[data-group^='" + dataGroup + "']").addClass("expanded-group");
-
-                        //$(this).addClass("expanded-group");
-                        //$(this).removeClass("collapsed-group");
-
                         fnExpandGroup(sGroup);
                     }
                 }
                 e.preventDefault();
 
             }; //end function _fnOnGroupClick
-
-            //var oTable = this;
-            var iYearIndex = 6;
-            var iYearLength = 4;
-            var asExpandedGroups = new Array();
-            var bInitialGrouping = true;
-
-            var properties = $.extend(defaults, options);
-
-            if (properties.sGrupingClass != null || properties.sGrupingClass2 != null)
-                alert("Since the version 1.1. sGrupingClass sGrupingClass2 are renamed to sGroupingClass and sGroupingClass2. Please correct your settings");
-
-            if (properties.iGroupingOrderByColumnIndex == -1) {
-                properties.bCustomColumnOrdering = false;
-                properties.iGroupingOrderByColumnIndex = properties.iGroupingColumnIndex;
-            } else {
-                properties.bCustomColumnOrdering = true;
-            }
-
-            if (properties.sGroupingColumnSortDirection == "") {
-                if (properties.sGroupBy == "year")
-                    properties.sGroupingColumnSortDirection = "desc";
-                else
-                    properties.sGroupingColumnSortDirection = "asc";
-            }
-
-
-            if (properties.iGroupingOrderByColumnIndex2 == -1) {
-                properties.bCustomColumnOrdering2 = false;
-                properties.iGroupingOrderByColumnIndex2 = properties.iGroupingColumnIndex2;
-            } else {
-                properties.bCustomColumnOrdering2 = true;
-            }
-
-            if (properties.sGroupingColumnSortDirection2 == "") {
-                if (properties.sGroupBy2 == "year")
-                    properties.sGroupingColumnSortDirection2 = "desc";
-                else
-                    properties.sGroupingColumnSortDirection2 = "asc";
-            }
-
-            if (properties.asExpandedGroups != null) {
-                if (properties.asExpandedGroups == "NONE") {
-                    properties.asExpandedGroups = [];
-                    asExpandedGroups = properties.asExpandedGroups;
-                    bInitialGrouping = false;
-                } else if (properties.asExpandedGroups == "ALL") {
-
-                } else if (properties.asExpandedGroups.constructor == String) {
-                    var currentGroup = properties.asExpandedGroups;
-                    properties.asExpandedGroups = new Array();
-                    properties.asExpandedGroups.push(_fnGetCleanedGroup(currentGroup));
-                    asExpandedGroups = properties.asExpandedGroups;
-                    bInitialGrouping = false;
-                } else if (properties.asExpandedGroups.constructor == Array) {
-                    for (var i = 0; i < properties.asExpandedGroups.length; i++) {
-                        asExpandedGroups.push(_fnGetCleanedGroup(properties.asExpandedGroups[i]));
-                        if (properties.bExpandSingleGroup)
-                            break;
-                    }
-                    bInitialGrouping = false;
-                }
-            }
-
-            iYearIndex = properties.sDateFormat.toLowerCase().indexOf('yy');
-            iYearLength = properties.sDateFormat.toLowerCase().lastIndexOf('y') - properties.sDateFormat.toLowerCase().indexOf('y') + 1;
-
-            iMonthIndex = properties.sDateFormat.toLowerCase().indexOf('mm');
-            iMonthLength = properties.sDateFormat.toLowerCase().lastIndexOf('m') - properties.sDateFormat.toLowerCase().indexOf('m') + 1;
-
-            var fnGetGroup = _fnGetGroupByName;
-            switch (properties.sGroupBy) {
-                case "letter": fnGetGroup = _fnGetGroupByLetter;
-                    break;
-                case "year": fnGetGroup = _fnGetGroupByYear;
-                    break;
-                case "month": fnGetGroup = _fnGetGroupByYearMonth;
-                    break;
-                default: fnGetGroup = _fnGetGroupByName;
-                    break;
-            }
-
-
-
-            var _fnDrawCallBackWithGrouping = function (oSettings) {
+			
+			
+			function _fnDrawCallBackWithGrouping (oSettings) {
 
                 if (oTable.fnSettings().oFeatures.bServerSide)
                     bInitialGrouping = true;
@@ -510,6 +418,7 @@
                         if (sLastGroup == null || _fnGetCleanedGroup(sGroup) != _fnGetCleanedGroup(sLastGroup)) { // new group encountered (or first of group)
                             var sGroupCleaned = _fnGetCleanedGroup(sGroup);
 
+							/*
                             if (properties.bExpandableGrouping && bInitialGrouping) {
                                 if (properties.bExpandSingleGroup) {
                                     if (asExpandedGroups.length == 0)
@@ -518,11 +427,17 @@
                                     asExpandedGroups.push(sGroupCleaned);
                                 }
                             }
+							*/
+							if(properties.bAddAllGroupsAsExpanded && jQuery.inArray(sGroupCleaned,asExpandedGroups) == -1)
+								asExpandedGroups.push(sGroupCleaned);
 
                             var oGroup = fnCreateGroupRow(sGroupCleaned, sGroup, iColspan);
                             var nGroup = oGroup.nGroup;
 
-                            nTrs[i].parentNode.insertBefore(nGroup, nTrs[i]);
+							if(nTrs[i].parentNode!=null)
+								nTrs[i].parentNode.insertBefore(nGroup, nTrs[i]);
+							else
+								$(nTrs[i]).before(nGroup);
                             $(nTrs[i]).attr("data-group", oGroup.dataGroup);
                             sLastGroup = sGroup;
                             sLastGroup2 = null; //to reset second level grouping
@@ -535,7 +450,7 @@
 
                         if (properties.bExpandableGrouping) {
                             $(nTrs[i]).addClass("group-item-" + sGroupCleaned);
-                            if (/*properties.bExpandSingleGroup &&*/_fnIsGroupCollapsed(sGroupCleaned)) {
+                            if (_fnIsGroupCollapsed(sGroupCleaned) && !properties.bUseFilteringForGrouping) {
                                 $(nTrs[i]).hide();
                             }
                         }
@@ -567,12 +482,106 @@
                 properties.fnOnGrouped();
 
                 bInitialGrouping = false;
+				
             }; // end of _fnDrawCallBackWithGrouping = function (oSettings)
 
 
-			if(properties.bUseFilteringForGrouping)
-				$.fn.dataTableExt.afnFiltering.push(_rowGroupingRowFilter);
+            //var oTable = this;
+            var iYearIndex = 6;
+            var iYearLength = 4;
+            var asExpandedGroups = new Array();
+            var bInitialGrouping = true;
 
+            var properties = $.extend(defaults, options);
+
+            if (properties.iGroupingOrderByColumnIndex == -1) {
+                properties.bCustomColumnOrdering = false;
+                properties.iGroupingOrderByColumnIndex = properties.iGroupingColumnIndex;
+            } else {
+                properties.bCustomColumnOrdering = true;
+            }
+
+            if (properties.sGroupingColumnSortDirection == "") {
+                if (properties.sGroupBy == "year")
+                    properties.sGroupingColumnSortDirection = "desc";
+                else
+                    properties.sGroupingColumnSortDirection = "asc";
+            }
+
+
+            if (properties.iGroupingOrderByColumnIndex2 == -1) {
+                properties.bCustomColumnOrdering2 = false;
+                properties.iGroupingOrderByColumnIndex2 = properties.iGroupingColumnIndex2;
+            } else {
+                properties.bCustomColumnOrdering2 = true;
+            }
+
+            if (properties.sGroupingColumnSortDirection2 == "") {
+                if (properties.sGroupBy2 == "year")
+                    properties.sGroupingColumnSortDirection2 = "desc";
+                else
+                    properties.sGroupingColumnSortDirection2 = "asc";
+            }
+
+			
+			
+            iYearIndex = properties.sDateFormat.toLowerCase().indexOf('yy');
+            iYearLength = properties.sDateFormat.toLowerCase().lastIndexOf('y') - properties.sDateFormat.toLowerCase().indexOf('y') + 1;
+
+            iMonthIndex = properties.sDateFormat.toLowerCase().indexOf('mm');
+            iMonthLength = properties.sDateFormat.toLowerCase().lastIndexOf('m') - properties.sDateFormat.toLowerCase().indexOf('m') + 1;
+
+            var fnGetGroup = _fnGetGroupByName;
+            switch (properties.sGroupBy) {
+                case "letter": fnGetGroup = _fnGetGroupByLetter;
+                    break;
+                case "year": fnGetGroup = _fnGetGroupByYear;
+                    break;
+                case "month": fnGetGroup = _fnGetGroupByYearMonth;
+                    break;
+                default: fnGetGroup = _fnGetGroupByName;
+                    break;
+            }
+			
+			
+            if (properties.asExpandedGroups != null) {
+                if (properties.asExpandedGroups == "NONE") {
+                    properties.asExpandedGroups = [];
+                    asExpandedGroups = properties.asExpandedGroups;
+                    bInitialGrouping = false;
+                } else if (properties.asExpandedGroups == "ALL") {
+					properties.bAddAllGroupsAsExpanded = true;
+                } else if (properties.asExpandedGroups.constructor == String) {
+                    var currentGroup = properties.asExpandedGroups;
+                    properties.asExpandedGroups = new Array();
+                    properties.asExpandedGroups.push(_fnGetCleanedGroup(currentGroup));
+                    asExpandedGroups = properties.asExpandedGroups;
+                    bInitialGrouping = false;
+                } else if (properties.asExpandedGroups.constructor == Array) {
+                    for (var i = 0; i < properties.asExpandedGroups.length; i++) {
+                        asExpandedGroups.push(_fnGetCleanedGroup(properties.asExpandedGroups[i]));
+                        if (properties.bExpandSingleGroup)
+                            break;
+                    }
+                    bInitialGrouping = false;
+                }
+            }else{
+				properties.asExpandedGroups = new Array();
+				properties.bAddAllGroupsAsExpanded = true;
+			}
+			if(properties.bExpandSingleGroup){
+			    var nTrs = $('tbody tr', oTable);
+				sGroupData = oTable.fnGetData(nTrs[0], properties.iGroupingColumnIndex);
+				
+				var sGroup = sGroupData;
+                if (properties.sGroupBy != "year")
+                    sGroup = fnGetGroup(sGroupData);
+
+				var sGroupCleaned = _fnGetCleanedGroup(sGroup);
+				properties.asExpandedGroups = new Array();
+				properties.asExpandedGroups.push(sGroupCleaned);
+							
+			}
 
             oTable.fnSetColumnVis(properties.iGroupingColumnIndex, !properties.bHideGroupingColumn);
             if (properties.bCustomColumnOrdering) {
@@ -644,7 +653,12 @@
 
             } // end of switch (properties.sGroupBy)
 
+			if(properties.bUseFilteringForGrouping)
+					$.fn.dataTableExt.afnFiltering.push(_rowGroupingRowFilter);
+			
             oTable.fnDraw();
+			
+
 
         });
     };
