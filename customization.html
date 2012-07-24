@@ -1,4 +1,4 @@
-﻿ <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+  <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html><head>
 
 	
@@ -37,8 +37,10 @@
 				$('#example').dataTable({ "bLengthChange": false, "bPaginate": false})
 						.rowGrouping({	bExpandableGrouping: true,
 								asExpandedGroups: ["Other Browsers", "Trident"],
-								fnOnGrouped: function() { /*alert('Rows are regrouped!');*/ },
-								fnGroupLabelFormat: function(label, id) { 
+								fnOnGrouped: function( oGroup ) { 
+                        var id =  oGroup.id;/*alert('Rows are regrouped!');*/ 
+                   },
+								fnGroupLabelFormat: function(label, oGroup) { 
 										return " <i>"+ label + "</i>";
 									} 
 								});
