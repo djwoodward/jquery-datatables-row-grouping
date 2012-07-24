@@ -479,7 +479,7 @@
 
 
                 //-----End grouping
-                properties.fnOnGrouped(oGroup);
+                properties.fnOnGrouped(aoGroups);
 
                 bInitialGrouping = false;
 				
