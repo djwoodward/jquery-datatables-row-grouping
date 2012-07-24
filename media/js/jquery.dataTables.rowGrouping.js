@@ -139,7 +139,7 @@
                 nGroup.appendChild(nCell);
                 aoGroups[sGroupCleaned] = oGroup;
                 oGroup.nGroup = nGroup;
-                properties.fnOnGroupCreated(nGroup, sGroupCleaned, 1);
+                properties.fnOnGroupCreated(oGroup, sGroupCleaned, 1);
                 return oGroup;
             }
 
@@ -189,7 +189,7 @@
                 oParentGroup.aoSubgroups[oGroup.dataGroup] = oGroup;
                 aoGroups[oGroup.dataGroup] = oGroup;
                 oGroup.nGroup = nGroup2;
-                properties.fnOnGroupCreated(nGroup2, sGroup2, 2);
+                properties.fnOnGroupCreated(oGroup, sGroup2, 2);
                 return oGroup;
             }
 
