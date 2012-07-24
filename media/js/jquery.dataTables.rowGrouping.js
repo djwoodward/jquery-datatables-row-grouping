@@ -1,6 +1,6 @@
 /*
 * File:        jquery.dataTables.grouping.js
-* Version:     1.2.5.
+* Version:     1.2.6.
 * Author:      Jovan Popovic 
 * 
 * Copyright 2012 Jovan Popovic, all rights reserved.
@@ -121,7 +121,7 @@
                 }
 
                 nCell.colSpan = iColspan;
-                nCell.innerHTML = properties.sGroupLabelPrefix + properties.fnGroupLabelFormat(sGroup == "" ? properties.sEmptyGroupLabel : sGroup);
+                nCell.innerHTML = properties.sGroupLabelPrefix + properties.fnGroupLabelFormat(sGroup == "" ? properties.sEmptyGroupLabel : sGroup, oGroup );
                 if (properties.bExpandableGrouping) {
 
                     if (!_fnIsGroupCollapsed(sGroupCleaned)) {
@@ -161,7 +161,7 @@
                 }
 
                 nCell2.colSpan = iColspan;
-                nCell2.innerHTML = properties.sGroupLabelPrefix2 + properties.fnGroupLabelFormat2(sGroupLabel == "" ? properties.sEmptyGroupLabel : sGroupLabel);
+                nCell2.innerHTML = properties.sGroupLabelPrefix2 + properties.fnGroupLabelFormat2(sGroupLabel == "" ? properties.sEmptyGroupLabel : sGroupLabel, oGroup);
 
                 if (properties.bExpandableGrouping) {
 
@@ -479,7 +479,7 @@
 
 
                 //-----End grouping
-                properties.fnOnGrouped();
+                properties.fnOnGrouped(oGroup);
 
                 bInitialGrouping = false;
 				
