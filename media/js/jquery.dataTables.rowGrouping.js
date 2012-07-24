@@ -1,6 +1,6 @@
 /*
 * File:        jquery.dataTables.grouping.js
-* Version:     1.2.6.
+* Version:     1.2.7.
 * Author:      Jovan Popovic 
 * 
 * Copyright 2012 Jovan Popovic, all rights reserved.
@@ -47,7 +47,13 @@
 
         }
 
-        function _fnOnGroupCreated(nGroup, sGroup, iLevel) {
+        function _fnOnGroupCreated(oGroup, sGroup, iLevel) {
+            ///<summary>
+            ///Function called when a new grouping row is created(it should be overriden in properties)
+            ///</summary>
+        }
+		
+		function _fnOnGroupCompleted(oGroup, sGroup, iLevel) {
             ///<summary>
             ///Function called when a new grouping row is created(it should be overriden in properties)
             ///</summary>
@@ -92,6 +98,7 @@
             fnOnGrouped: _fnOnGrouped,
 
             fnOnGroupCreated: _fnOnGroupCreated,
+	    fnOnGroupCompleted: _fnOnGroupCompleted,
 
             oHideEffect: null, // { method: "hide", duration: "fast", easing: "linear" },
             oShowEffect: null,//{ method: "show", duration: "slow", easing: "linear" }
@@ -110,7 +117,7 @@
                 var nCell = document.createElement('td');
                 nGroup.id = "group-id-" + oTable.attr("id") + "_" + sGroupCleaned;
 
-                var oGroup = { id: nGroup.id, key: sGroupCleaned, text: sGroup, level: 0, groupItemClass: ".group-item-" + sGroup, dataGroup: sGroupCleaned, aoSubgroups: new Array() };
+                var oGroup = { id: nGroup.id, key: sGroupCleaned, text: sGroup, level: 0, groupItemClass: ".group-item-" + sGroupCleaned, dataGroup: sGroupCleaned, aoSubgroups: new Array() };
 
 
 
@@ -417,7 +424,11 @@
 
                         if (sLastGroup == null || _fnGetCleanedGroup(sGroup) != _fnGetCleanedGroup(sLastGroup)) { // new group encountered (or first of group)
                             var sGroupCleaned = _fnGetCleanedGroup(sGroup);
-
+				
+			    if(sLastGroup != null)
+			    {
+			    	properties.fnOnGroupCompleted(aoGroups[_fnGetCleanedGroup(sLastGroup)]);
+			    }
 							/*
                             if (properties.bExpandableGrouping && bInitialGrouping) {
                                 if (properties.bExpandSingleGroup) {
@@ -476,6 +487,10 @@
                     } // end for (var i = 0; i < nTrs.length; i++)
                 }; // if (oSettings.aiDisplay.length > 0)
 
+				if(sLastGroup != null)
+			    {
+			    	properties.fnOnGroupCompleted(aoGroups[_fnGetCleanedGroup(sLastGroup)]);
+			    }
 
 
                 //-----End grouping

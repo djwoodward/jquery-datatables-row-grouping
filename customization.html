@@ -36,13 +36,20 @@
 			$(document).ready( function () {
 				$('#example').dataTable({ "bLengthChange": false, "bPaginate": false})
 						.rowGrouping({	bExpandableGrouping: true,
-								asExpandedGroups: ["Other Browsers", "Trident"],
-								fnOnGrouped: function( oGroup ) { 
-                        var id =  oGroup.id;/*alert('Rows are regrouped!');*/ 
-                   },
-								fnGroupLabelFormat: function(label, oGroup) { 
-										return " <i>"+ label + "</i>";
-									} 
+										asExpandedGroups: ["Other Browsers", "Trident"],
+										fnOnGrouped: function( aoGroups ) { 
+											$("#demo").append("<p>Grouping finished!</p>");
+										},
+										fnOnGroupCreated: function( oGroup ) { 
+											$("#demo").append("<p>Created group - " + oGroup.text + "</p>"); 
+										},
+										fnOnGroupCompleted: function( oGroup ) { 
+											var length = $('#example tr' + oGroup.groupItemClass).length;
+											$(oGroup.nGroup).find("td").append("<sub>"+length+"</sub>");
+										},
+										fnGroupLabelFormat: function(label, oGroup) { 
+											return " <i>"+ label + "</i>";
+										} 
 								});
 			} );
 		</script>
@@ -87,7 +94,6 @@
 			
 			
 			<h2>Live example</h2>
-
 
 
 
