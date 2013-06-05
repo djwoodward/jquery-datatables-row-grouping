@@ -1,9 +1,9 @@
 /*
 * File:        jquery.dataTables.grouping.js
-* Version:     1.2.7.
+* Version:     1.2.8.
 * Author:      Jovan Popovic 
 * 
-* Copyright 2012 Jovan Popovic, all rights reserved.
+* Copyright 2013 Jovan Popovic, all rights reserved.
 *
 * This source file is free software, under either the GPL v2 license or a
 * BSD style license, as supplied with this software.
@@ -16,6 +16,7 @@
 * @sGroupingColumnSortDirection                         Enumeration         Sort direction of the group
 * @iGroupingOrderByColumnIndex                          Integer             Index of the column that will be used for ordering groups
 * @sGroupingClass                                       String              Class that will be associated to the group row. Default - "group"
+* @sGroupItemClass                                      String              Class that will be associated to the group row of group items. Default - "group-item"
 * @bSetGroupingClassOnTR                                Boolean             If set class will be set to the TR instead of the TD withing the grouping TR
 * @bHideGroupingColumn                                  Boolean             Hide column used for grouping once results are grouped. Default - true
 * @bHideGroupingOrderByColumn                           Boolean             Hide column used for ordering groups once results are grouped. Default - true
@@ -33,6 +34,7 @@
 * @sGroupingColumnSortDirection2                        Enumeration         Sort direction of the secondary group
 * @iGroupingOrderByColumnIndex2                         Integer             Index of the column that will be used for ordering secondary groups
 * @sGroupingClass2                                      String              Class that will be associated to the secondary group row. Default "subgroup"
+* @sGroupItemClass2                                     String              Class that will be associated to the secondary group row of group items. Default "subgroup-item"
 * @bHideGroupingColumn2                                 Boolean             Hide column used for secondary grouping once results are grouped. Default - true,
 * @bHideGroupingOrderByColumn2                          Boolean             Hide column used for ordering secondary groups once results are grouped. Default - true,
 * @sGroupBy2                                            Enumeration         Type of grouping that should be applied to secondary column. Values "name"(default), "letter", "year",
@@ -60,7 +62,7 @@
         }
 
         function _getMonthName(iMonth) {
-            var asMonths = ["January", "February", "March", "April", "May", "June", "Jully", "August", "September", "October", "November", "December"];
+            var asMonths = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
             return asMonths[iMonth - 1];
         }
 
@@ -70,6 +72,7 @@
             sGroupingColumnSortDirection: "",
             iGroupingOrderByColumnIndex: -1,
             sGroupingClass: "group",
+			sGroupItemClass: "group-item",
             bHideGroupingColumn: true,
             bHideGroupingOrderByColumn: true,
             sGroupBy: "name",
@@ -88,6 +91,7 @@
             sGroupingColumnSortDirection2: "",
             iGroupingOrderByColumnIndex2: -1,
             sGroupingClass2: "subgroup",
+            sGroupItemClass2: "subgroup-item",
             bHideGroupingColumn2: true,
             bHideGroupingOrderByColumn2: true,
             sGroupBy2: "name",
@@ -98,7 +102,7 @@
             fnOnGrouped: _fnOnGrouped,
 
             fnOnGroupCreated: _fnOnGroupCreated,
-	    fnOnGroupCompleted: _fnOnGroupCompleted,
+            fnOnGroupCompleted: _fnOnGroupCompleted,
 
             oHideEffect: null, // { method: "hide", duration: "fast", easing: "linear" },
             oShowEffect: null,//{ method: "show", duration: "slow", easing: "linear" }
@@ -459,8 +463,9 @@
 
                         } // end if (sLastGroup == null || sGroup != sLastGroup)
 
+                        $(nTrs[i]).addClass(properties.sGroupItemClass);
+                        $(nTrs[i]).addClass("group-item-" + sGroupCleaned);
                         if (properties.bExpandableGrouping) {
-                            $(nTrs[i]).addClass("group-item-" + sGroupCleaned);
                             if (_fnIsGroupCollapsed(sGroupCleaned) && !properties.bUseFilteringForGrouping) {
                                 $(nTrs[i]).hide();
                             }
@@ -479,6 +484,7 @@
                             }
 
                             $(nTrs[i]).attr("data-group", oGroup2.dataGroup)
+										.addClass(properties.sGroupItemClass2)
                                         .addClass("group-item-" + oGroup2.dataGroup);
                         } //end if (bUseSecondaryGrouping)
 
