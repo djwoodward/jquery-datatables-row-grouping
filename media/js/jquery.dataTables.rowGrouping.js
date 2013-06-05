@@ -429,10 +429,10 @@
                         if (sLastGroup == null || _fnGetCleanedGroup(sGroup) != _fnGetCleanedGroup(sLastGroup)) { // new group encountered (or first of group)
                             var sGroupCleaned = _fnGetCleanedGroup(sGroup);
 				
-			    if(sLastGroup != null)
-			    {
-			    	properties.fnOnGroupCompleted(aoGroups[_fnGetCleanedGroup(sLastGroup)]);
-			    }
+                            if(sLastGroup != null)
+                            {
+                            	properties.fnOnGroupCompleted(aoGroups[_fnGetCleanedGroup(sLastGroup)]);
+                            }
 							/*
                             if (properties.bExpandableGrouping && bInitialGrouping) {
                                 if (properties.bExpandSingleGroup) {
@@ -453,7 +453,7 @@
 								nTrs[i].parentNode.insertBefore(nGroup, nTrs[i]);
 							else
 								$(nTrs[i]).before(nGroup);
-                            $(nTrs[i]).attr("data-group", oGroup.dataGroup);
+
                             sLastGroup = sGroup;
                             sLastGroup2 = null; //to reset second level grouping
 
@@ -462,6 +462,8 @@
 
 
                         } // end if (sLastGroup == null || sGroup != sLastGroup)
+						
+						$(nTrs[i]).attr("data-group", aoGroups[sGroupCleaned].dataGroup);
 
                         $(nTrs[i]).addClass(properties.sGroupItemClass);
                         $(nTrs[i]).addClass("group-item-" + sGroupCleaned);
