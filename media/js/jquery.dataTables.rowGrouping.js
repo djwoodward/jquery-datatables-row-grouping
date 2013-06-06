@@ -1,6 +1,6 @@
 /*
 * File:        jquery.dataTables.grouping.js
-* Version:     1.2.8.
+* Version:     1.2.9.
 * Author:      Jovan Popovic 
 * 
 * Copyright 2013 Jovan Popovic, all rights reserved.
@@ -42,6 +42,8 @@
 * @fnOnGrouped                                          Function            Function that is called when grouping is finished. Function has no parameters.
 */
 (function ($) {
+
+	"use strict";
 
     $.fn.rowGrouping = function (options) {
 
@@ -161,7 +163,7 @@
                 var nCell2 = document.createElement('td');
                 var dataGroup = oParentGroup.dataGroup + '_' + sGroup2;
 
-                oGroup = { id: nGroup2.id, key: sGroup2, text: sGroupLabel, level: oParentGroup.level + 1, groupItemClass: ".group-item-" + dataGroup,
+                var oGroup = { id: nGroup2.id, key: sGroup2, text: sGroupLabel, level: oParentGroup.level + 1, groupItemClass: ".group-item-" + dataGroup,
                     dataGroup: dataGroup, aoSubgroups: new Array()
                 };
 
@@ -352,7 +354,7 @@
                         fnExpandGroup(sGroup);
 
                         if (properties.iExpandGroupOffset != -1) {
-                            var position = $("#group-id-" + oTable.attr("id") + "-" + sGroup).offset().top - properties.iExpandGroupOffset;
+                            var position = $("#group-id-" + oTable.attr("id") + "_" + sGroup).offset().top - properties.iExpandGroupOffset;
                             window.scroll(0, position);
                         } else {
                             var position = oTable.offset().top;
@@ -551,8 +553,8 @@
             iYearIndex = properties.sDateFormat.toLowerCase().indexOf('yy');
             iYearLength = properties.sDateFormat.toLowerCase().lastIndexOf('y') - properties.sDateFormat.toLowerCase().indexOf('y') + 1;
 
-            iMonthIndex = properties.sDateFormat.toLowerCase().indexOf('mm');
-            iMonthLength = properties.sDateFormat.toLowerCase().lastIndexOf('m') - properties.sDateFormat.toLowerCase().indexOf('m') + 1;
+            var iMonthIndex = properties.sDateFormat.toLowerCase().indexOf('mm');
+            var iMonthLength = properties.sDateFormat.toLowerCase().lastIndexOf('m') - properties.sDateFormat.toLowerCase().indexOf('m') + 1;
 
             var fnGetGroup = _fnGetGroupByName;
             switch (properties.sGroupBy) {
@@ -594,7 +596,7 @@
 			}
 			if(properties.bExpandSingleGroup){
 			    var nTrs = $('tbody tr', oTable);
-				sGroupData = oTable.fnGetData(nTrs[0], properties.iGroupingColumnIndex);
+				var sGroupData = oTable.fnGetData(nTrs[0], properties.iGroupingColumnIndex);
 				
 				var sGroup = sGroupData;
                 if (properties.sGroupBy != "year")
