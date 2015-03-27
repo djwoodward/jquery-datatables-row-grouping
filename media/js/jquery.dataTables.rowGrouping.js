@@ -3,6 +3,7 @@
 * Version:     1.2.10.
 * Author:      Jovan Popovic 
 * 
+* https://github.com/djwoodward/jquery-datatables-row-grouping/blob/master/media/js/jquery.dataTables.rowGrouping.js
 * Originally hosted at https://code.google.com/p/jquery-datatables-row-grouping
 * 
 * Copyright 2013 Jovan Popovic, all rights reserved.
