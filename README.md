@@ -30,9 +30,4 @@ See more datails about plugin options on the [[Options]] page
 
 ## Examples
 
-There are lot of examples of row groung usage, You can either download them from the http://code.google.com/p/jquery-datatables-row-grouping/downloads/list or you can see following online examples:
- - Basic http://jquery-datatables-row-grouping.googlecode.com/svn/trunk/default.html
- - Grouping by letters http://jquery-datatables-row-grouping.googlecode.com/svn/trunk/letters.html
- - Grouping by the year column http://jquery-datatables-row-grouping.googlecode.com/svn/trunk/year.html
- - Collapsible/expandable grouping http://jquery-datatables-row-grouping.googlecode.com/svn/trunk/collapsibleGroups.html
- - Two level grouping http://jquery-datatables-row-grouping.googlecode.com/svn/trunk/twoLevelGrouping.html
+There are lot of examples of row groung usage, You can either download them from https://github.com/djwoodward/jquery-datatables-row-grouping

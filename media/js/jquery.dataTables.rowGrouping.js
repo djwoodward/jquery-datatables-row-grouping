@@ -1,6 +1,6 @@
 /*
 * File:        jquery.dataTables.grouping.js
-* Version:     1.2.10.
+* Version:     1.2.11.
 * Author:      Jovan Popovic 
 * 
 * https://github.com/djwoodward/jquery-datatables-row-grouping/blob/master/media/js/jquery.dataTables.rowGrouping.js
