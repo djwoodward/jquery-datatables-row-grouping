@@ -250,7 +250,7 @@
 
             function _fnGetCleanedGroup(sGroup) {
 
-                if (sGroup === "") return "-";
+                if (typeof sGroup === "undefined" || sGroup === "") return properties.sEmptyGroupLabel;
                 return sGroup.toLowerCase().replace(/[^a-zA-Z0-9\u0080-\uFFFF]+/g, "-"); //fix for unicode characters (Issue 23)
                 //return sGroup.toLowerCase().replace(/\W+/g, "-"); //Fix provided by bmathews (Issue 7)
             }
@@ -260,7 +260,7 @@
                 if (oSettings.nTable.id !== oTable[0].id) return true;
                 var sColData = aData[properties.iGroupingColumnIndex];
                 if (typeof sColData === "undefined")
-                    sColData = aData[oSettings.aoColumns[properties.iGroupingColumnIndex].mDataProp];
+                    sColData = aData[oSettings.aoColumns[properties.iGroupingColumnIndex].mData];
                 if (_fnIsGroupCollapsed(_fnGetCleanedGroup(sColData))) {
                     if (oTable.fnIsOpen(oTable.fnGetNodes(iDataIndex)))
                     {
@@ -414,7 +414,7 @@
                         //Issue 31 - Start fix provided by Fabien Taysse 
 //                      sGroupData = oSettings.aoData[oSettings.aiDisplay[iDisplayIndex]]._aData[properties.iGroupingColumnIndex];
 //                      if (sGroupData == undefined)
-//                          sGroupData = oSettings.aoData[oSettings.aiDisplay[iDisplayIndex]]._aData[oSettings.aoColumns[properties.iGroupingColumnIndex].mDataProp];
+//                          sGroupData = oSettings.aoData[oSettings.aiDisplay[iDisplayIndex]]._aData[oSettings.aoColumns[properties.iGroupingColumnIndex].mData];
                         sGroupData = this.fnGetData(nTrs[i], properties.iGroupingColumnIndex);
                         //Issue 31 - End fix provided by Fabien Taysse 
 
@@ -425,7 +425,7 @@
                         if (bUseSecondaryGrouping) {
                             sGroupData2 = oSettings.aoData[oSettings.aiDisplay[iDisplayIndex]]._aData[properties.iGroupingColumnIndex2];
                             if (sGroupData2 == undefined)
-                                sGroupData2 = oSettings.aoData[oSettings.aiDisplay[iDisplayIndex]]._aData[oSettings.aoColumns[properties.iGroupingColumnIndex2].mDataProp];
+                                sGroupData2 = oSettings.aoData[oSettings.aiDisplay[iDisplayIndex]]._aData[oSettings.aoColumns[properties.iGroupingColumnIndex2].mData];
                             if (properties.sGroupBy2 != "year")
                                 sGroup2 = fnGetGroup(sGroupData2);
                         }
