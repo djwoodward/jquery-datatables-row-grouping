@@ -280,8 +280,8 @@
                 
                 aoGroups[sGroup].state = "expanded";    
                 
-                $("td[data-group='" + sGroup + "']").removeClass("collapsed-group");
-                $("td[data-group='" + sGroup + "']").addClass("expanded-group");
+                $("td[data-group='" + sGroup + "']").removeClass("collapsed-group")
+                                                    .addClass("expanded-group");
                         
                         
                 if(properties.bUseFilteringForGrouping)
@@ -308,8 +308,8 @@
                 ///<summary>Collapse group if expanadable grouping is used</summary>
 
                 aoGroups[sGroup].state = "collapsed";
-                $("td[data-group='" + sGroup + "']").removeClass("expanded-group");
-                $("td[data-group='" + sGroup + "']").addClass("collapsed-group");
+                $("td[data-group='" + sGroup + "']").removeClass("expanded-group")
+                                                    .addClass("collapsed-group");
                 
                 if(properties.bUseFilteringForGrouping)
                 {
@@ -417,13 +417,16 @@
 //                          sGroupData = oSettings.aoData[oSettings.aiDisplay[iDisplayIndex]]._aData[oSettings.aoColumns[properties.iGroupingColumnIndex].mData];
                         sGroupData = this.fnGetData(nTrs[i], properties.iGroupingColumnIndex);
                         //Issue 31 - End fix provided by Fabien Taysse 
-
+                        //Issue
+                        if (sGroupData === null||sGroupData === undefined) sGroupData = properties.sEmptyGroupLabel;
+                        //Issue
                         var sGroup = sGroupData;
                         if (properties.sGroupBy != "year")
                             sGroup = fnGetGroup(sGroupData);
 
                         if (bUseSecondaryGrouping) {
                             sGroupData2 = oSettings.aoData[oSettings.aiDisplay[iDisplayIndex]]._aData[properties.iGroupingColumnIndex2];
+                            if (sGroupData2 === null||sGroupData2 === undefined) sGroupData2 = properties.sEmptyGroupLabel;
                             if (sGroupData2 == undefined)
                                 sGroupData2 = oSettings.aoData[oSettings.aiDisplay[iDisplayIndex]]._aData[oSettings.aoColumns[properties.iGroupingColumnIndex2].mData];
                             if (properties.sGroupBy2 != "year")
@@ -468,10 +471,9 @@
 
                         } // end if (sLastGroup == null || sGroup != sLastGroup)
                         
-                        $(nTrs[i]).attr("data-group", aoGroups[sGroupCleaned].dataGroup);
-
-                        $(nTrs[i]).addClass(properties.sGroupItemClass);
-                        $(nTrs[i]).addClass("group-item-" + sGroupCleaned);
+                        $(nTrs[i]).attr("data-group", aoGroups[sGroupCleaned].dataGroup)
+                                  .addClass(properties.sGroupItemClass)
+                                  .addClass("group-item-" + sGroupCleaned);
                         if (properties.bExpandableGrouping) {
                             if (_fnIsGroupCollapsed(sGroupCleaned) && !properties.bUseFilteringForGrouping) {
                                 $(nTrs[i]).hide();
